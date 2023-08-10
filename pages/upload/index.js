@@ -7,15 +7,17 @@ import {
   FcRefresh,
 } from "react-icons/fc";
 
-import Button from "react-bootstrap/Button";
-import FloatingLabel from "react-bootstrap/FloatingLabel";
-import Form from "react-bootstrap/Form";
-import Dropdown from "react-bootstrap/Dropdown";
+// import Button from "react-bootstrap/Button";
+// import FloatingLabel from "react-bootstrap/FloatingLabel";
+// import Form from "react-bootstrap/Form";
+// import Dropdown from "react-bootstrap/Dropdown";
 
 function UploadPage() {
   const [fileUpload, setFileUpload] = useState(null);
-  const [documentType, setDocumentType] = useState(null);
-  const [comments, setComments] = useState("");
+  const [documentList, setDocumentList] = useState([])
+  // const [documentType, setDocumentType] = useState(null);
+  // const [comments, setComments] = useState("");
+  const fileInput = useRef(null);
 
   async function onFileUpload() {
     fileInput.current.click();
@@ -26,26 +28,27 @@ function UploadPage() {
     setFileUpload(fileuploaded);
   }
 
-  const handleDropdownSelect = (eventKey) => {
-    setDocumentType(eventKey);
-  };
+  // const handleDropdownSelect = (eventKey) => {
+  //   setDocumentType(eventKey);
+  // };
 
-  const handleCommentsChange = (event) => {
-    setComments(event.target.value);
-  };
+  // const handleCommentsChange = (event) => {
+  //   setComments(event.target.value);
+  // };
 
   async function onDocumentUpload() {
     if (fileUpload) {
-      
+      const headers = {
+        Authorization : `Bearer ${sessionStorage.getItem("accessToken")}`,
+        "Content-Type": "multipart/form-data",
+      }
+
+      const formData = new FormData()
+      formData.append('file', new Blob([fileUpload], {type :'application/octet-stream'}))
       try {
 
-        const res = await fetch('http://54.193.180.218:8000/uploadfile', {
-          method: 'POST',
-          body: JSON.stringify({
-            file : fileUpload
-          }),
-          headers: { 'Content-Type': 'binary' }
-        });
+        const response = await axios.post('http://54.193.180.218:8000/uploadfile',formData, {headers:headers });
+        console.log("successfully uploaded")
         
       } catch (error) {
         console.error("Error uploading file:", error);
@@ -53,6 +56,25 @@ function UploadPage() {
       }
     }
   }
+
+  async function getDocumentsList() {
+    console.log("Get documentList")
+
+    try {
+      const response = await axios.get("http://54.193.180.218:8000/get_files", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setDocumentList(response.data);
+      console.log("this is response ", response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+
   return (
     <div>
       <div className="upload-container">
@@ -60,7 +82,7 @@ function UploadPage() {
         {/* Button section */}
         <div className="flex w-full justify-around mt-3 ">
           <div className="w-1/3">
-            <Button
+            <button
               variant="primary"
               onClick={onFileUpload}
               className=" w-full"
@@ -76,13 +98,13 @@ function UploadPage() {
 
                 <FcOpenedFolder className="text-2xl w-full" />
               </div>
-            </Button>
+            </button>
           </div>
           <div className="w-1/3">
-            <Button variant="primary" className="w-full">
+            <button variant="primary" className="w-full">
               <div>Scan Document</div>
               <FcCamera className="text-2xl w-full" />
-            </Button>
+            </button>
           </div>
         </div>
         <div className="mt-3">
@@ -109,7 +131,7 @@ function UploadPage() {
           )}
         </div>
         {/* Choose Category */}
-        <h4 className="mt-3">Add Detail</h4>
+        {/* <h4 className="mt-3">Add Detail</h4>
         <div className="mt-3 w-full">
           <Dropdown name="type" onSelect={handleDropdownSelect}>
             <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -124,10 +146,10 @@ function UploadPage() {
               <Dropdown.Item eventKey="Other">Other</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-        </div>
+        </div> */}
 
         {/* Comment Section */}
-        <div className="mt-3">
+        {/* <div className="mt-3">
           <FloatingLabel controlId="floatingTextarea2" label="Comments">
             <Form.Control
               as="textarea"
@@ -137,35 +159,30 @@ function UploadPage() {
               style={{ height: "100px" }}
             />
           </FloatingLabel>
-        </div>
+        </div> */}
 
         <div className="mt-3">
-          <Button
+          <button
             variant="primary"
-            className="w-full"
-            disabled={documentType === null}
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            disabled={fileUpload === null}
             onClick={onDocumentUpload}
           >
             <div>Submit</div>
-          </Button>
+          </button>
         </div>
       </div>
       <hr></hr>
       <div>
         <div className="flex">
-          <h3>Step 2 : Check your Documents</h3>
-          <FcRefresh className="text-3xl ml-auto" />
+          <h3>Check your Documents</h3>
+          <FcRefresh className="text-3xl ml-auto" onclick={getDocumentsList} />
+          {documentList && documentList.map((item)=>{
+            
+          })}
         </div>
         <div className="w-full">
-          {documentList ? (
-            <div>
-              <DocumentTable documents={documentList} />
-            </div>
-          ) : (
-            <div>
-              <div>hi</div>
-            </div>
-          )}
+          
         </div>
       </div>
     </div>
