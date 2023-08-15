@@ -38,6 +38,7 @@ export default function LoginPage() {
       setMessage("Logged in successfully!");
 
       // You can return or process the response if needed
+      window.location.href = "/upload";
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);

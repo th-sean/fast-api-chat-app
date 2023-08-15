@@ -65,12 +65,14 @@ const Navbar = () => {
             <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-md z-10 transition-transform transform translate-x-0 transition duration-300 ">
               <div className="w-full bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] h-40">
                 <button
-                  className="text-3xl font-bold absolute top-0 right-0 p-4"
+                  className="text-2xl font-bold absolute top-0 right-0 p-4 "
                   onClick={() => setdrawerOpen(false)}
                 >
-                  <GrClose className="text-white" />
+                  <div className="">
+                    <GrClose className="text-white" />
+                  </div>
                 </button>
-                <div></div>
+                
               </div>
               {tabs.map((tab, index) => (
                 <div

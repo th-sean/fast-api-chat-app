@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <div>
       <Navbar />
-      <div className="py-8 px-10 bg-slate-100">
+      <div className="">
         <Component {...pageProps} />
       </div>
     </div>

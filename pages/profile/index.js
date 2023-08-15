@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import AuthNotFound from "../../components/authNotfound";
 
 function ProfilePage() {
   const [message, setMessage] = useState("");
@@ -63,43 +64,31 @@ function ProfilePage() {
   //   }
 
   return token && token.length > 0 ? (
-    <div>
-      <div>Show me curret user inforomation</div>
-      {userInfo && (
-        <div className="text-xs text-gray-500 mb-3">
-          <p className="text-xs text-gray-500 mb-3">{"id : " + userInfo.id}</p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"username : " + userInfo.username}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"chroma_path : " + userInfo.chroma_path}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"openai_key : " + userInfo.openai_key}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"serp_key : " + userInfo.serp_key}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"email : " + userInfo.email}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"full_name : " + userInfo.full_name}
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            {"disabled : " + userInfo.disabled}
-          </p>
+    <div className="py-8 px-10 bg-slate-100">
+      <div className="bg-white p-5 rounded-lg">
+        <div className="text-lg font-bold p-2">Account inforomation</div>
+        {userInfo && (
+          <div className="p-4">
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(userInfo).map(([key, value]) => (
+              <div key={key} className="flex items-center space-x-2 overflow-hidden truncate">
+                <p className="text-gray-500 font-semibold">{key}:</p>
+                <p className="text-gray-800">{value}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
-      <button
-        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={checkuser}
-      >
-        Load User Info
-      </button>
-      <div>
-        <div className="mt-5">Update Openai_Key/Update sero_key</div>
-        <form onSubmit={handleKey}>
+        )}
+        <button
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={checkuser}
+        >
+          Show User Info
+        </button>
+      </div>
+      <div className="bg-white p-5 rounded-lg mt-5">
+        <div className="text-lg font-bold p-2 ">Update API Keys</div>
+        <form onSubmit={handleKey} className="p-2">
           <div className="mb-4">
             <label
               htmlFor="openai_key"
@@ -140,7 +129,7 @@ function ProfilePage() {
       </div>
     </div>
   ) : (
-    <div>please login </div>
+    <AuthNotFound />
   );
 }
 

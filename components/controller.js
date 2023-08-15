@@ -109,28 +109,7 @@ function Controller() {
 	return (
 		
 			<div className="flex z-0 drawer lg:drawer-open h-full">
-				{/* <label
-					htmlFor="my-drawer"
-					className={
-						"drawer-overlay w-full h-full absolute top-0 right-0 bottom-0 left-0 z-10 bg-black opacity-20" +
-						(isSideBarOpen ? " block" : " hidden")
-					}
-					onClick={() => {
-						setIsSideBarOpen(false);
-					}}
-				></label>
-				<input
-					id="my-drawer"
-					type="checkbox"
-					className="drawer-toggle"
-				/>
-				<div
-					className={
-						"drawer-side h-full w-[260px] z-10 lg:shadow-2xl lg:shadow-[#b3b6e6]"
-					}
-				>
-					<FileController />
-				</div> */}
+				
 				<div className="drawer-content flex-1 h-full z-0">
 					<ChatController
 						inputText={inputText}
