@@ -13,7 +13,7 @@ export default function Chat() {
         </div>
         <div className="text-black pt-5 rounded-xl p-5 w-1/2 font-bold border-2 hover:bg-[#2a8ce6] hover:text-white transition duration-300 m-2">
         <Link href="/profile" className="w-full text-sm ">
-            Set API Key
+            Set API Keys
           </Link>
         </div>
       </div>
