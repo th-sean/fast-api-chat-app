@@ -1,5 +1,5 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
-import React, {useState} from "react";
+import React, { useState } from "react";
 function ChatController({
   inputText,
   isLoading,
@@ -37,6 +37,11 @@ function ChatController({
       handleClick();
     }
   };
+  const handleHandleInstruction = (itemText) => () =>{
+    setInputText(itemText);
+    
+  }
+ 
 
   return (
     <div>
@@ -58,8 +63,8 @@ function ChatController({
             </div>
             <div className="grid grid-cols-2 gap-4 align-center justify-center px-8 mt-40">
               {Instruction.map((item, index) => (
-                <div key={index} className="border rounded-xl p-5 text-xs">
-                  <div className="font-bold text-gray-700">{item.title}</div>
+                <div key={index} className="border rounded-xl p-5 text-xs hover:bg-gray-200" onClick={handleHandleInstruction(item.text)}>
+                  <div className="font-bold text-gray-700" >{item.title}</div>
                   <div className="text-gray-400">{item.text}</div>
                 </div>
               ))}

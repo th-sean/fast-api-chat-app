@@ -166,6 +166,7 @@ function UploadPage() {
       <div className="bg-white p-5 rounded-lg mt-4">
         <div>
           <div className="text-lg font-bold p-2 ">Check your Documents</div>
+          <div></div>
           {documentList &&
             documentList.map((item, index) => (
               <div
