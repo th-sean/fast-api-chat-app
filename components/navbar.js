@@ -47,7 +47,7 @@ const HamburgerNavbar = () => {
     setToken(sessionStorage.getItem("accessToken"));
     console.log("this is token at chatbotpage" + token);
 
-    if (token.length == 0 ||  token.length == null) {
+    if (!token || token.length === 0)  {
       setSignedUser(false);
     } else {
       setSignedUser(true);
