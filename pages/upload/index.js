@@ -52,7 +52,7 @@ function UploadPage() {
       formData.append("file", fileUpload);
 
       const response = await axios
-        .post("http://54.193.180.218:5173/uploadfile", formData, {
+        .post("http://54.193.180.218:8000/uploadfile", formData, {
           headers: headers,
         })
         .then(async (response) => {
@@ -76,7 +76,7 @@ function UploadPage() {
     console.log("Get documentList");
 
     try {
-      const response = await axios.get("http://54.193.180.218:5173/get_files", {
+      const response = await axios.get("http://54.193.180.218:8000/get_files", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",

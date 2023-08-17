@@ -31,7 +31,7 @@ function Controller() {
 		// Console log test
 		console.log(data);
 
-		await fetch("http://54.193.180.218:5173/chain", {
+		await fetch("http://54.193.180.218:8000/chain", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -77,7 +77,7 @@ function Controller() {
 	};
 
 	const handleRefresh = async () => {
-		await fetch("http://54.193.180.218:5173/clear_chat_history", {
+		await fetch("http://54.193.180.218:8000/clear_chat_history", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
