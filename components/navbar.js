@@ -13,7 +13,7 @@ import {
 } from "react-icons/bs"
 import { GrClose } from "react-icons/gr";
 
-const Navbar = () => {
+const HamburgerNavbar = () => {
   const [signedUser, setSignedUser] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [drawerOpen, setdrawerOpen] = useState(false);
@@ -55,22 +55,19 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="bg-blue-600 p-4 relative">
+    <div className="bg-blue-600 p-4 relative lg:hidden">
       {drawerOpen && (
         <div
           className="fixed top-0 left-0 h-full w-full bg-black bg-opacity-50 z-20 "
           onClick={() => setdrawerOpen(false)}
         >
           {drawerOpen && (
-            <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-md z-10 transition-transform transform translate-x-0 transition duration-300 ">
+            <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-md z-10 transition-transform transform translate-x-0 transition duration-300 custom:hidden">
               <div className="w-full bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] h-40">
                 <button
                   className="text-2xl font-bold absolute top-0 right-0 p-4 "
                   onClick={() => setdrawerOpen(false)}
                 >
-                  <div className="">
-                    <GrClose className="text-white" />
-                  </div>
                 </button>
                 
               </div>
@@ -117,4 +114,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default HamburgerNavbar;

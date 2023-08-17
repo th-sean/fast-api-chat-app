@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useState } from "react";
-import { login } from "../../utils/api";
 import axios from "axios";
 
 export default function LoginPage() {
@@ -99,7 +98,7 @@ export default function LoginPage() {
           </div>
         </form>
         <p className="mt-4 text-sm text-gray-600">
-          Don't have an account?{" "}
+          Don't have an account?
           <Link
             href="/register"
             className="text-skyblue-500 font-medium hover:underline"

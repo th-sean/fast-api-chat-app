@@ -23,18 +23,16 @@ function RegisterPage() {
     }
 
     try {
-      const response = await axios.post(
-        "http://54.193.180.218:8000/register",
-        {
+      const response = await fetch("http://54.193.180.218:8000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           username: formData.username,
           password: formData.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+        }),
+      });
 
       // Assuming a successful response means the user has been registered
       setMessage("Registered successfully!");
