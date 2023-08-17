@@ -16,7 +16,7 @@ function ProfilePage() {
     console.log("Session in component:", token);
 
     try {
-      const response = await axios.get("http://54.193.180.218:8000/users/me", {
+      const response = await axios.get("http://54.193.180.218:5173/users/me", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",
@@ -44,7 +44,7 @@ function ProfilePage() {
     };
     try {
       const response = await axios.post(
-        "http://54.193.180.218:8000/set_api",
+        "http://54.193.180.218:5173/set_api",
         bodyRequest,
         {
           headers: {

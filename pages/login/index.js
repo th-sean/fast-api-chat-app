@@ -21,7 +21,7 @@ export default function LoginPage() {
     try {
       console.log("try triggered");
       const response = await axios.post(
-        "http://54.193.180.218:8000/token",
+        "http://54.193.180.218:5173/token",
         bodyRequest,
         {
           headers: {
