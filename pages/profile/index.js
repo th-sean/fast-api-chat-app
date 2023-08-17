@@ -10,7 +10,7 @@ function ProfilePage() {
   useEffect(() => {
     setToken(sessionStorage.getItem("accessToken"));
     console.log("this is token at chatbotpage" + token);
-  });
+  },[token] );
 
   async function checkuser() {
     console.log("Session in component:", token);

@@ -52,7 +52,7 @@ const HamburgerNavbar = () => {
     } else {
       setSignedUser(true);
     }
-  }, []);
+  }, [token]);
 
   return (
     <div className="bg-blue-600 p-4 relative lg:hidden">

@@ -42,7 +42,6 @@ function ChatController({
 
   return (
     <div>
-      <div></div>
       <div className="mt-5 rounded-lg bg-[#fdfeff] relative flex w-full flex-1 overflow-hidden flex-col justify-between h-full shadow-[#b3b6e6] z-20">
         {/* <div className="flex justify-between items-center w-full p-4 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] font-bold "></div> */}
 
@@ -140,8 +139,8 @@ function ChatController({
           </div>
         )}
 
-        <div className="bg-white p-4 bottom-0 flex flex-row justify-between h-18 mb-2">
-          <div className="flex flex-grow px-4">
+        <div className="bg-black p-4 bottom-0 flex flex-row justify-between h-18 mb-2 position fixed shadow-[#b3b6e6]">
+          <div className="flex flex-grow px-4 ">
             <input
               type="text"
               className="border p-2 mr-2 w-full  rounded-xl"
