@@ -63,7 +63,7 @@ function ProfilePage() {
   //     return <div>Please Login to continue</div>;
   //   }
 
-  return token && token.length > 0 ? (
+  return token && token.length > 0 || token.length !== null ? (
     <div className="py-8 px-10 bg-slate-100">
       <div className="bg-white p-5 rounded-lg">
         <div className="text-lg font-bold p-2">Account inforomation</div>
