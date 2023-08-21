@@ -41,10 +41,8 @@ function ChatController({
   };
 
   return (
-    <div>
-      <div className="mt-5 rounded-lg bg-[#fdfeff] relative flex w-full flex-1 overflow-hidden flex-col justify-between h-full shadow-[#b3b6e6] z-20">
-        {/* <div className="flex justify-between items-center w-full p-4 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] font-bold "></div> */}
-
+    <div className="w-full h-full">
+      <div className="overflow-y-auto w-full mb-40">
         {/* Conversation */}
         {messages.length == 0 ? (
           // <div className="font-bold text-8xl text-[#cccfef8c] text-center">
@@ -52,10 +50,10 @@ function ChatController({
           // </div>
 
           <div className="">
-            <div className="font-bold text-4xl text-[#cccfef8c] text-center mt-10">
+            <div className="font-bold text-7xl text-[#cccfef8c] text-center mt-10">
               Chatbot-Demo
             </div>
-            <div className="grid grid-cols-2 gap-4 align-center justify-center px-8 mt-40">
+            <div className="grid grid-cols-2 gap-4 align-center mt-20 justify-center  p-10">
               {Instruction.map((item, index) => (
                 <div
                   key={index}
@@ -69,21 +67,18 @@ function ChatController({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col justify-between h-full overflow-y-scroll pb-96">
-            <div>hi</div>
-            <div className="border border-gray-300"></div>
+          <div className="flex flex-col justify-between h-full">
+            <div className="p-6"></div>
+            <div className="border-t border-gray-300"></div>
             <div className="">
               {messages?.map((message, key) => {
                 return message.sender == "me" ? (
                   <>
-                    <div
-                      className="chat chat-end bg-white p-5 flex"
-                      key={key}
-                    >
+                    <div className="bg-white px-20 py-5 flex" key={key}>
                       <div className="text-white">
-                      <AiOutlineUser className="text-4xl fill-current bg-blue-400 rounded p-1" />
+                        <AiOutlineUser className="text-4xl fill-current bg-blue-400 rounded p-1" />
                       </div>
-                      <div className="chat-bubble chat-bubble-info ml-5">
+                      <div className="ml-5">
                         {message.message}
                         <div>
                           <time className=" text-xs opacity-50">
@@ -92,13 +87,14 @@ function ChatController({
                         </div>
                       </div>
                     </div>
-                    <div className="border border-gray-300"></div>
+                    <div className="border-t border-gray-300"></div>
                   </>
                 ) : message.sender == "bot-loading" && isLoading ? (
                   <>
-                    <div className=" bg-gray-100 p-5 flex" key={key}>
-                      <AiOutlineRobot className="text-4xl bg-white rounded p-1" />
-
+                    <div className=" bg-gray-100 px-20 py-5  flex " key={key}>
+                      <div className="text-white">
+                        <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
+                      </div>
                       <div className="chat-bubble chat-bubble-primary ml-5">
                         {message.message}
                         <div>
@@ -115,12 +111,14 @@ function ChatController({
                         </div>
                       </div>
                     </div>
-                    <div className="border border-gray-300"></div>
+                    <div className="border-t border-gray-300"></div>
                   </>
                 ) : (
                   <>
-                    <div className=" bg-gray-100 p-5 flex" key={key}>
-                      <AiOutlineRobot className="text-4xl bg-white rounded p-1" />
+                    <div className=" bg-gray-100 px-20 py-5  flex" key={key}>
+                      <div className="text-white">
+                        <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
+                      </div>
 
                       <div className="chat-bubble chat-bubble-primary ml-5">
                         {message.message}
@@ -131,40 +129,46 @@ function ChatController({
                         </div>
                       </div>
                     </div>
-                    <div className="border border-gray-300"></div>
+                    <div className="border-t border-gray-300"></div>
                   </>
                 );
               })}
             </div>
           </div>
         )}
+      </div>
 
-        <div className="bg-black p-4 bottom-0 flex flex-row justify-between h-18 mb-2 position fixed shadow-[#b3b6e6]">
-          <div className="flex flex-grow px-4 ">
-            <input
-              type="text"
-              className="border p-2 mr-2 w-full  rounded-xl"
-              placeholder={
-                isLoading ? "Wait a second...." : "Type your message..."
-              }
-              value={inputText}
-              onChange={handleInputChange}
-              onKeyDown={handleEnter}
-            />
-          </div>
-          <div className="flex w-1/7 justify-center">
-            <button
-              className={
-                "py-2 px-4 mr-4 rounded-3xl hover:bg-green-300 hover:text-white" +
-                (isLoading
-                  ? " opacity-40 bg--[#2a8ce6] text-white "
-                  : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
-              }
-              onClick={handleClick}
-            >
-              <AiOutlineSend className="text-2xl " />
-            </button>
-          </div>
+      <div
+        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 p-4  items-center "
+        style={{
+          background:
+            "linear-gradient(rgba(255,255,255,0), rgba(220, 220, 220,1))",
+        }}
+      >
+        <div className="flex-grow px-4 py-3">
+          <textarea
+            rows="1"
+            className="w-full border p-4 rounded-xl"
+            placeholder={
+              isLoading ? "Wait a second...." : "Type your message..."
+            }
+            value={inputText}
+            onChange={handleInputChange}
+            onKeyDown={handleEnter}
+          />
+        </div>
+        <div className="flex-shrink-0 h-full">
+          <button
+            className={
+              "py-2 px-4 mr-4 rounded-3xl hover:bg-green-300 hover:text-white" +
+              (isLoading
+                ? " opacity-40 bg--[#2a8ce6] text-white "
+                : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
+            }
+            onClick={handleClick}
+          >
+            <AiOutlineSend className="text-2xl " />
+          </button>
         </div>
       </div>
     </div>

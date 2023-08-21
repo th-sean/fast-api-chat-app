@@ -173,14 +173,14 @@ function UploadPage() {
                 key={index}
                 className="flex border flex items-center font-medium p-3 rounded-lg hover:shadow-lg hover:bg-gray-200  transition duration-300 m-2"
               >
-                <div className="overflow-hidden truncate">{item}</div>
+                <div className="overflow-hidden truncate">{ item.file_name}</div>
                 <div className="ml-auto hover:bg-gray-100 p-2 rounded-lg">
                   <AiOutlineDelete className="text-red-500 text-xl" />
                 </div>
               </div>
             ))}
         </div>
-        <div className="w-full"></div>
+        
       </div>
     </div>
   );

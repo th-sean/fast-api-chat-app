@@ -55,7 +55,7 @@ const HamburgerNavbar = () => {
   }, [token]);
 
   return (
-    <div className="bg-blue-600 p-4 relative lg:hidden">
+    <div className="bg-slate-100 p-4 relative lg:hidden">
       {drawerOpen && (
         <div
           className="fixed top-0 left-0 h-full w-full bg-black bg-opacity-50 z-20 "
@@ -76,7 +76,7 @@ const HamburgerNavbar = () => {
                   key={index}
                   className={`${
                     selectedTabIndex === index ? "bg-blue-500 text-white" : ""
-                  } flex items-center justify-center align-center font-medium p-3 rounded-lg hover:bg-gray-100 transition duration-300 m-2`}
+                  } flex items-center justify-center align-center font-medium p-3 rounded-lg hover:bg-blue-200 transition duration-300 m-2`}
                   onClick={() => {
                     setSelectedTabIndex(index);
                     setdrawerOpen(false); // Close the drawer when a tab is clicked

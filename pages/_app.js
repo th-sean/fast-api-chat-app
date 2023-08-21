@@ -5,11 +5,13 @@ import DesktopDrawer from "../components/desktopDrawer";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="hidden lg:block"> <DesktopDrawer/></div>
-      <div className="w-full overflow-y-auto">
-        <HamburgerNavbar className="lg:hidden"/>
-        <div className="w-full">
+    <div className="flex flex-col h-screen lg:flex-row">
+      <div className="hidden lg:block">
+        <DesktopDrawer />
+      </div>
+      <HamburgerNavbar className="lg:hidden fixed top-0" />
+      <div className="w-full overflow-y-auto bg-slate-100">
+        <div className="flex-grow overflow-y-auto ">
           <Component {...pageProps} />
         </div>
       </div>

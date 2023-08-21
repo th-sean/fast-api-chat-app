@@ -46,7 +46,7 @@ const DesktopDrawer = () => {
           key={index}
           className={`${
             selectedTabIndex === index ? "bg-blue-500 text-white" : ""
-          } flex items-center justify-center align-center font-medium p-3 rounded-lg hover:bg-gray-100 transition duration-300 m-2`}
+          } flex items-center justify-center align-center font-medium p-3 rounded-lg hover:bg-blue-200 transition duration-300 m-2`}
           onClick={() => {
             setSelectedTabIndex(index);
           }}

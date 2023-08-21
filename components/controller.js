@@ -108,9 +108,7 @@ function Controller() {
 
 	return (
 		
-			<div className="flex z-0 drawer lg:drawer-open h-full">
-				
-				<div className="drawer-content flex-1 h-full z-0">
+			<div className="w-full">
 					<ChatController
 						inputText={inputText}
 						isLoading={isLoading}
@@ -120,7 +118,6 @@ function Controller() {
 						handleClick={handleClick}
 						handleRefresh={handleRefresh}
 					/>
-				</div>
 			</div>
 		
 	);
