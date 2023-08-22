@@ -148,7 +148,7 @@ function ChatController({
         <div className="flex-grow px-4 py-3">
           <textarea
             rows="1"
-            className="w-full border p-4 rounded-xl"
+            className="w-full border p-4 rounded-xl focus:border-blue-400 focus:outline-none "
             placeholder={
               isLoading ? "Wait a second...." : "Type your message..."
             }

@@ -4,7 +4,7 @@ import { } from "react-icons/ai"
 
 export default function Chat() {
   return (
-    <div className="w-full bg-slate-100 flex items-center justify-center">
+    <div className="w-full bg-white flex items-center justify-center">
 
       <Controller />
       
