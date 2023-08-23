@@ -1,5 +1,6 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
-import React, { useState } from "react";
+import React, { useState, useEffect, } from "react";
+import { useRouter } from "next/router";
 function ChatController({
   inputText,
   isLoading,
@@ -9,6 +10,8 @@ function ChatController({
   handleClick,
   handleRefresh,
 }) {
+  const router = useRouter();
+  const { docId } = router.query;
   const Instruction = [
     {
       title: "Access Documents",
@@ -44,7 +47,7 @@ function ChatController({
     <div className="w-full h-full">
       <div className="overflow-y-auto w-full mb-40">
         {/* Conversation */}
-        {messages.length == 0 ? (
+        {messages.length == 0 && !docId ? (
           // <div className="font-bold text-8xl text-[#cccfef8c] text-center">
           // 	chat
           // </div>

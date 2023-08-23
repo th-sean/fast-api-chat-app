@@ -1,19 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BsUpload, BsFilter } from "react-icons/bs";
 import Modal from "react-modal";
-import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
-import { FaSearch } from "react-icons/fa";
 import axios from "axios";
+import { useRouter } from "next/router";
+import { BsUpload, BsFilter } from "react-icons/bs";
+import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
+import { CiMenuKebab } from "react-icons/ci";
+import { FaSearch } from "react-icons/fa";
+
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.snow.css";
 
 function UploadPage() {
   const [fileUpload, setFileUpload] = useState(null);
   const [documentList, setDocumentList] = useState([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [fileIdToDelete, setFileIdToDelete] = useState(null);
+  const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [modalTitle, setModalTitle] = useState("");
   const [modalBody, setModalBody] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [showUploadDropdown, setShowUploadDropdown] = useState(false);
+  const [showKebabDropdown, setShowKebabDropdown] = useState(false);
+  const dropdownUploadRef = useRef(false);
+  const dropdownKebabRef = useRef(false);
+  const router = useRouter();
+
+  const openDeleteModal = (item, fileId) => {
+    setFileIdToDelete(fileId);
+    setFileInfoToDelete(item);
+    setIsDeleteModalOpen(true);
+  };
   const popupClassNames = `
   fixed
   bottom-4         // 1rem from the bottom
@@ -35,53 +54,62 @@ function UploadPage() {
   // };
   const [showPopup, setShowPopup] = useState(false);
   const fileInput = useRef(null);
-  // const [editorContent, setEditorContent] = useState("");
+
+  const [editorContent, setEditorContent] = useState("");
 
   useEffect(() => {
     getDocumentsList();
-    const closeDropdown = (e) => {
-      if (!e.target.closest(".relative")) {
-        // If clicked outside the dropdown container
-        setIsDropdownOpen(false);
+    const handleClickOutside = (event) => {
+      const isOutsideUploadDropdown =
+        showUploadDropdown &&
+        dropdownUploadRef.current &&
+        !dropdownUploadRef.current.contains(event.target);
+      const isOutsideKebabDropdown =
+        showKebabDropdown !== null &&
+        dropdownKebabRef.current &&
+        !dropdownKebabRef.current.contains(event.target);
+
+      if (isOutsideUploadDropdown || isOutsideKebabDropdown) {
+        handleCloseDropdowns();
       }
     };
-
-    // document.addEventListener("mousedown", closeDropdown);
-    // return () => {
-    //   document.removeEventListener("mousedown", closeDropdown);
-    // };
+    document.body.addEventListener("click", handleClickOutside);
+    return () => {
+      document.body.removeEventListener("click", handleClickOutside);
+    };
   }, []);
 
-  const handleModalSubmit = () => {
-    const fileTitle = modalTitle.replace(/\s+/g, "_"); // Replace spaces with underscores
-    const fileContent = modalBody;
-
-    const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, `${fileTitle}.txt`);
-
-    setIsModalOpen(false);
-  };
-
-  async function onFileUpload() {
+  async function handleFileChoose() {
     fileInput.current.click();
   }
 
   function handleChange(e) {
     const fileUploaded = e.target.files[0];
     if (!fileUploaded) return;
-
     setFileUpload(fileUploaded);
     handleFileUpload(fileUploaded);
     setShowPopup(true);
+    setShowUploadDropdown(null);
   }
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const handlePromptOpen = () => {
+    setShowUploadDropdown(false);
+    setIsModalOpen(true);
   };
 
-  const handleOpenModalClick = () => {
-    setIsDropdownOpen(false);
-    setIsModalOpen(true);
+  const toggleUploadDropdown = (event) => {
+    event.stopPropagation();
+    setShowUploadDropdown(!showUploadDropdown);
+  };
+
+  const toggleKebabDropdown = (event, index) => {
+    event.stopPropagation();
+    setShowKebabDropdown(index === showKebabDropdown ? null : index);
+  };
+
+  const handleCloseDropdowns = () => {
+    setShowKebabDropdown(null);
+    setShowUploadDropdown(false);
   };
 
   async function handleFileUpload(file) {
@@ -119,8 +147,11 @@ function UploadPage() {
       console.log("Failed Uploaded");
     } finally {
       setUploading(false);
+      getDocumentsList();
     }
   }
+
+  async function handlePromptSubmit() {}
 
   async function getDocumentsList() {
     console.log("Get documentList");
@@ -139,43 +170,85 @@ function UploadPage() {
     }
   }
 
+  function redirectToChatbot(file_id) {
+    const documentId = file_id; // Replace with how you retrieve the ID
+    router.push(`/chatbot?docId=${documentId}`);
+  }
+
+  async function deleteDocument() {
+    try {
+      const response = await axios.get(
+        `http://54.193.180.218:8000/delete_file/${fileIdToDelete}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("this is response ", response.data);
+
+      if (response.status === 200) {
+        console.log("Deleted document");
+
+        // // Show the popup with the success message
+        // setPopupMessage("Successfully deleted!");
+        // setShowPopup(true);
+
+        // // Set a timeout to hide the popup after 3 seconds
+        // setTimeout(() => {
+        //   setShowPopup(false);
+        // }, 3000);
+        getDocumentsList();
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+    setIsDeleteModalOpen(false);
+  }
+
   return (
     <div className="py-8 px-10 bg-slate-100">
       <div className="bg-white p-5 rounded-lg ">
-        <div className="text-lg font-bold p-2 ">All fies</div>
-        <div className="flex w-full items-center justify-between">
-          <div className="relative ">
+        <div className="text-lg font-bold p-2">All fies </div>
+        <div className="flex flex-wrap w-full items-center justify-between">
+          <div className="relative mb-2 md:mb-0 flex z-10">
             {/* Title Button */}
 
             <button
-              onClick={toggleDropdown}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex"
+              onClick={(e) => toggleUploadDropdown(e)}
+              className="mt-2 md:mt-0 px-4 py-2 bg-blue-500 text-white rounded hover:bg-gray-300 flex"
             >
               <BsUpload className="text-xl mr-3" />
               <div>Upload</div>
             </button>
 
             {/* Dropdown Menu */}
-            {isDropdownOpen && (
-              <div className="absolute top-full mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-                <button
-                  className="block w-full py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  onClick={onFileUpload}
-                >
-                  Document
-                  <input
-                    type="file"
-                    ref={fileInput}
-                    onChange={handleChange}
-                    style={{ display: "none" }}
-                  ></input>
-                </button>
-                <button
-                  className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  onClick={handleOpenModalClick}
-                >
-                  Prompt
-                </button>
+            {showUploadDropdown && (
+              <div
+                ref={dropdownUploadRef}
+                className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded shadow-lg"
+              >
+                <ul>
+                  <li
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={handleFileChoose}
+                  >
+                    <div>Document</div>
+                    <input
+                      type="file"
+                      ref={fileInput}
+                      onChange={handleChange}
+                      style={{ display: "none" }}
+                    ></input>
+                  </li>
+                  <li
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={handlePromptOpen}
+                  >
+                    <div>Prompt</div>
+                  </li>
+                </ul>
               </div>
             )}
           </div>
@@ -208,11 +281,11 @@ function UploadPage() {
             </div>
           )} */}
           </div>
-          <div className="relative ml-4 w-full">
+          <div className="w-full md:w-1/3 relative mt-2 md:mt-0 ">
             {/* Input Field */}
             <input
               type="text"
-              className="border rounded-md pl-10 pr-4 py-2 focus:border-blue-400 focus:outline-none"
+              className="border rounded-md w-full pl-10 pr-4 py-2 focus:border-blue-400 focus:outline-none"
               placeholder="Search..."
             />
 
@@ -221,10 +294,6 @@ function UploadPage() {
               <FaSearch />
             </div>
           </div>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-gray-300 flex">
-            <BsFilter className="text-xl mr-3" />
-            <div>Filter</div>
-          </button>
         </div>
         <Modal
           isOpen={isModalOpen}
@@ -239,28 +308,82 @@ function UploadPage() {
             onChange={(e) => setModalTitle(e.target.value)}
           />
           <h2>Modal Body</h2>
-          {/* <ReactQuill 
-                value={editorContent}
-                onChange={setEditorContent}
-            /> */}
-          <button onClick={handleModalSubmit}>Submit</button>
+          {/* <ReactQuill value={editorContent} onChange={setEditorContent} /> */}
+          <button onClick={handlePromptSubmit}>Submit</button>
         </Modal>
       </div>
       <hr></hr>
       <div className="bg-white p-5 rounded-lg mt-4">
         <div>
-          <div className="text-lg font-bold p-2 ">Check your Documents</div>
+          <div className="text-lg font-bold p-2 ">
+            {documentList.length} Files Found
+          </div>
           <div></div>
           {documentList &&
             documentList.map((item, index) => (
               <div
                 key={index}
-                className="flex border flex items-center font-medium p-3 rounded-lg hover:shadow-lg hover:bg-gray-200  transition duration-300 m-2"
+                className="relative flex border items-center font-medium p-3 rounded-lg hover:shadow-lg hover:bg-gray-200 transition duration-300 m-2"
               >
                 <div className="overflow-hidden truncate">{item.file_name}</div>
-                <div className="ml-auto hover:bg-gray-100 p-2 rounded-lg">
-                  <AiOutlineDelete className="text-red-500 text-xl" />
+                <div
+                  className="ml-auto hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
+                  onClick={(e) => toggleKebabDropdown(e, index)}
+                >
+                  <CiMenuKebab className="text-gray-600 text-xl" />
                 </div>
+                {showKebabDropdown === index && (
+                  <div
+                    ref={dropdownKebabRef}
+                    className="absolute top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
+                  >
+                    <ul>
+                      <li className="p-2 hover:bg-gray-100 cursor-pointer">
+                        Download
+                      </li>
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => redirectToChatbot(item.id)}
+                      >
+                        Summarize
+                      </li>
+                      <li
+                        className="p-2 text-white rounded-lg bg-red-500 hover:bg-red-600 cursor-pointer"
+                        onClick={() => openDeleteModal(item, item.id)}
+                      >
+                        Delete
+                        <Modal
+                          className="modal"
+                          isOpen={isDeleteModalOpen}
+                          onRequestClose={() => setIsDeleteModalOpen(false)}
+                          overlayClassName="modal-overlay"
+                        >
+                          <h2 className="text-lg font-bold">
+                            Are you sure you want to delete the file?
+                          </h2>
+                          <p className="text-xs mt-5">
+                            Are you sure you want to delete{" "}
+                            <strong>{" " + item.file_name}</strong> ?
+                          </p>
+                          <div className="flex justify-end mt-5">
+                            <button
+                              onClick={() => setIsDeleteModalOpen(false)}
+                              className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={deleteDocument}
+                              className="bg-red-500 text-white px-4 py-2 rounded"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </Modal>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
         </div>
@@ -277,7 +400,7 @@ function UploadPage() {
               onClick={() => setShowPopup(false)}
               className="bg-red-500 text-white rounded p-2 hover:bg-red-600"
             >
-              <AiOutlineClose/>
+              <AiOutlineClose />
             </button>
           </div>
           <div className="flex justify-between items-center mb-4 ">

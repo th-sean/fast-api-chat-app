@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FileController from "./fileController.js";
 import ChatController from "./chatController.js";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 function Controller() {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+  const router = useRouter();
+  const { docId } = router.query;
+
+  useEffect(() => {
+    if (docId) {
+      // Fetch the document summary or any other initial action using the docId
+      fetchSummary(docId);
+    }
+  }, []);
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -67,6 +77,32 @@ function Controller() {
         console.log(err);
       });
 
+    setIsLoading(false);
+  };
+
+  const fetchSummary = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`http://54.193.180.218:8000/summary/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+
+      });
+      
+      if (res.ok) {
+        const summary = await res.text();
+        const time = moment().format("h:mm");
+        const botMessage = { sender: "bot", message: summary, time };
+        setMessages([...messages, botMessage]);
+      } else {
+        // handle errors like you did in the handleClick function
+      }
+    } catch (err) {
+      console.log(err);
+    }
     setIsLoading(false);
   };
 
