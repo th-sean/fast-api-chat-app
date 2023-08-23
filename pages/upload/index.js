@@ -142,9 +142,12 @@ function UploadPage() {
         window.alert("File uploaded successfully");
         getDocumentsList();
       } else {
+        setUploadProgress(-1)
       }
     } catch (error) {
       console.log("Failed Uploaded");
+     
+      setUploadProgress(-1)
     } finally {
       setUploading(false);
       getDocumentsList();
@@ -392,9 +395,10 @@ function UploadPage() {
         <div className={popupClassNames}>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold overflow-hidden truncate">
-              {uploadProgress.progress === 1
-                ? "Completed"
-                : `Uploading... ${Math.round(uploadProgress.progress * 100)}%`}
+              {uploadProgress.progress === 1 
+                ? ("Completed")
+                : uploading ? (`Uploading... ${Math.round(uploadProgress.progress * 100)}%`)
+                : ("Failed to upload")}
             </h2>
             <button
               onClick={() => setShowPopup(false)}
