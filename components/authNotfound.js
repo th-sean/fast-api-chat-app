@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const authNotFound = () => {
+const AuthNotFound = () => {
   return (
     <div className="w-full bg-white p-8 rounded-lg shadow-md w-80 justify-center">
       <div className=" text-xl text-center font-medium">
@@ -18,4 +18,4 @@ const authNotFound = () => {
   );
 };
 
-export default authNotFound;
+export default AuthNotFound;

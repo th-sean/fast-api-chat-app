@@ -1,6 +1,5 @@
-import HamburgerNavbar from "../components/navbar";
-import "tailwindcss/tailwind.css";
 import "../styles/globals.css";
+import HamburgerNavbar from "../components/navbar";
 import DesktopDrawer from "../components/desktopDrawer";
 
 function MyApp({ Component, pageProps }) {
