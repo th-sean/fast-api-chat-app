@@ -3,6 +3,7 @@ import FileController from "./fileController.js";
 import ChatController from "./chatController.js";
 import moment from "moment";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 function Controller() {
   const [inputText, setInputText] = useState("");
@@ -81,19 +82,20 @@ function Controller() {
   };
 
   const fetchSummary = async (id) => {
+    const selectedId = id
     setIsLoading(true);
     try {
-      const res = await fetch(`http://54.193.180.218:8001/summary/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
 
-      });
-      
-      if (res.ok) {
-        const summary = await res.text();
+      const response = await axios.post(`/api/chatbot/getSummary`, { selectedId: selectedId },{
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+                "Content-Type": "application/json",
+            },
+        });
+   
+      console.log("is this summary?")
+      if (response.data.success) {
+        const summary = await response.data.response;
         const time = moment().format("h:mm");
         const botMessage = { sender: "bot", message: summary, time };
         setMessages([...messages, botMessage]);

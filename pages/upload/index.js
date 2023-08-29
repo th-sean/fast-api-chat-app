@@ -21,6 +21,7 @@ function UploadPage() {
   const [PromptModalBody, setPromptModalBody] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [deleteProgress, setDeleteProgress] = useState(0)
 
   const [showUploadDropdown, setShowUploadDropdown] = useState(false);
   const [showKebabDropdown, setShowKebabDropdown] = useState(false);
@@ -151,14 +152,14 @@ function UploadPage() {
     console.log("Get documentList");
 
     try {
-      const response = await axios.get("http://54.193.180.218:8001/get_files", {
+      const response = await axios.get("/api/upload/getDocumentsList", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",
         },
       });
-      setDocumentList(response.data);
-      console.log("this is response ", response.data);
+      setDocumentList(response.data.response);
+ 
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -170,19 +171,26 @@ function UploadPage() {
   }
 
   async function deleteDocument() {
+    const selectedId = fileIdToDelete
+    console.log("this is delete document id" + selectedId)
     try {
-      const response = await axios.get(
-        `http://54.193.180.218:8001/delete_file/${fileIdToDelete}`,
+      const response = await axios.post(
+        `/api/upload/getDeleteDocument`,
+        { selectedId: selectedId },
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
           },
-        }
+          onDeleteProgress: (progressEvent) => {
+            setDeleteProgress(progressEvent);
+          },
+        },
+        
       );
       console.log("this is response ", response.data);
 
-      if (response.status === 200) {
+      if (response.data.success) {
         console.log("Deleted document");
 
         // // Show the popup with the success message
