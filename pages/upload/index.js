@@ -13,12 +13,12 @@ import { FaSearch } from "react-icons/fa";
 function UploadPage() {
   const [fileUpload, setFileUpload] = useState(null);
   const [documentList, setDocumentList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [fileIdToDelete, setFileIdToDelete] = useState(null);
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalBody, setModalBody] = useState("");
+  const [PromptModalTitle, setPromptModalTitle] = useState("");
+  const [PromptModalBody, setPromptModalBody] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -84,7 +84,7 @@ function UploadPage() {
   }
 
   function handleChange(e) {
-    const fileUploaded = e.target.files[0];
+    const fileUploaded = e.target.files;
     if (!fileUploaded) return;
     setFileUpload(fileUploaded);
     handleFileUpload(fileUploaded);
@@ -94,7 +94,7 @@ function UploadPage() {
 
   const handlePromptOpen = () => {
     setShowUploadDropdown(false);
-    setIsModalOpen(true);
+    setIsPromptModalOpen(true);
   };
 
   const toggleUploadDropdown = (event) => {
@@ -115,43 +115,34 @@ function UploadPage() {
   async function handleFileUpload(file) {
     if (!file) return;
 
-    try {
-      setUploading(true);
+    setUploading(true);
 
-      const formData = new FormData();
-      formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file[0]);
+    console.log()
+    const response = await axios.post(
+      "/api/upload/postFileUpload",
+      formData,
+      {
+        headers: {
+          "Authorization": `Bearer ${sessionStorage.getItem("accessToken")}`,
+        },
+        onUploadProgress: (progressEvent) => {
+          setUploadProgress(progressEvent);
+        },
+      
+      },
+  
+    );
 
-      const response = await axios.post(
-        "http://54.193.180.218:8000/uploadfile",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          },
-          onUploadProgress: (progressEvent) => {
-            // Calculate the progress percentage
-            setUploadProgress(progressEvent);
-
-            // Update progress or display a loading overlay
-            // For example: setProgress(progress);
-          },
-        }
-      );
-
-      if (response.ok) {
-        window.alert("File uploaded successfully");
-        getDocumentsList();
-      } else {
-        setUploadProgress(-1)
-      }
-    } catch (error) {
-      console.log("Failed Uploaded");
-     
-      setUploadProgress(-1)
-    } finally {
-      setUploading(false);
+    if (response.data.success) {
       getDocumentsList();
+    } else {
+      setUploadProgress(-1);
     }
+
+    setUploading(false);
+    getDocumentsList();
   }
 
   async function handlePromptSubmit() {}
@@ -160,7 +151,7 @@ function UploadPage() {
     console.log("Get documentList");
 
     try {
-      const response = await axios.get("http://54.193.180.218:8000/get_files", {
+      const response = await axios.get("http://54.193.180.218:8001/get_files", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",
@@ -181,7 +172,7 @@ function UploadPage() {
   async function deleteDocument() {
     try {
       const response = await axios.get(
-        `http://54.193.180.218:8000/delete_file/${fileIdToDelete}`,
+        `http://54.193.180.218:8001/delete_file/${fileIdToDelete}`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -299,16 +290,16 @@ function UploadPage() {
           </div>
         </div>
         <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
+          isOpen={isPromptModalOpen}
+          onRequestClose={() => setIsPromptModalOpen(false)}
           className="modal"
           overlayClassName="modal-overlay"
         >
           <h2>File name</h2>
           <input
             type="text"
-            value={modalTitle}
-            onChange={(e) => setModalTitle(e.target.value)}
+            value={PromptModalTitle}
+            onChange={(e) => setPromptModalTitle(e.target.value)}
           />
           <h2>Modal Body</h2>
           {/* <ReactQuill value={editorContent} onChange={setEditorContent} /> */}
@@ -395,10 +386,11 @@ function UploadPage() {
         <div className={popupClassNames}>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold overflow-hidden truncate">
-              {uploadProgress.progress === 1 
-                ? ("Completed")
-                : uploading ? (`Uploading... ${Math.round(uploadProgress.progress * 100)}%`)
-                : ("Failed to upload")}
+              {uploadProgress.progress === 1
+                ? "Completed"
+                : uploading
+                ? `Uploading... ${Math.round(uploadProgress.progress * 100)}%`
+                : "Failed to upload"}
             </h2>
             <button
               onClick={() => setShowPopup(false)}
@@ -409,7 +401,7 @@ function UploadPage() {
           </div>
           <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-xs overflow-hidden truncate">
-              {fileUpload ? <div> {fileUpload.name}</div> : <div>Null</div>}{" "}
+              {fileUpload ? <div> {fileUpload[0].name}</div> : <div>Null</div>}{" "}
             </h2>
             <p className="font-bold text-xs">
               {(uploadProgress.progress * 100).toFixed(0)}%

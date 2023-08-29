@@ -13,43 +13,30 @@ export default function LoginPage() {
 
     console.log("this is username" + username);
     console.log("this is password" + password);
-
-    const bodyRequest = `username=${encodeURIComponent(
-      username
-    )}&password=${encodeURIComponent(password)}`;
-
     try {
-      console.log("try triggered");
-      const response = await axios.post(
-        "http://54.193.180.218:8000/token",
-        bodyRequest,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
+      const response = await axios.post("/api/postlogin", {
+        username: username,
+        password: password,
+      });
+
+      console.log(
+        "successfully retrive the access token to login.js" +
+          response.data
       );
-      const accessToken = response.data.access_token;
-      console.log("access Token Ready " + accessToken);
-      sessionStorage.setItem('accessToken', accessToken);
-
-      // Assuming a successful response means the user has logged in
-      setMessage("Logged in successfully!");
-
-      // You can return or process the response if needed
+      // setMessage(response.data.message);
+      sessionStorage.setItem("accessToken", response.data.accessToken);
       window.location.href = "/upload";
-      return response.data;
     } catch (error) {
-      console.error("Error logging in:", error);
-
-      // If there's an error message in the response, use that, otherwise use a generic error message
-      const errorMessage =
-        error.response && error.response.data && error.response.data.message
-          ? error.response.data.message
-          : "An error occurred during login.";
-
-      setMessage(errorMessage);
+      // setMessage(error.response.data.message);
     }
+
+    // if (response.data.success) {
+    //   setMessage(response.data.message);
+    //   sessionStorage.setItem("accessToken", response.data.accessToken);
+    //   window.location.href = "/upload";
+    // } else {
+    //   setMessage(response.data.message);
+    // }
   };
 
   return (
