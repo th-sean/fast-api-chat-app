@@ -58,7 +58,7 @@ const DesktopDrawer = () => {
         </div>
       ))}
       </div>
-      <div className="">hi</div>
+      
     </div>
   );
 };
