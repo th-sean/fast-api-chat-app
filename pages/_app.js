@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   
-  const showNavigation = router.pathname !== '/login';
+  const showNavigation = router.pathname !== '/login' && router.pathname !== '/register';
 
   return (
     <div className="flex flex-col h-screen lg:flex-row">
