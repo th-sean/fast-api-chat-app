@@ -1,4 +1,5 @@
 import axios from "axios";
+import moment from "moment";
 
 export default async function handler(req, res) {
     const token = req.headers.authorization.split(" ")[1];
@@ -13,21 +14,22 @@ export default async function handler(req, res) {
             },
         });
         console.log("can you see summary of document? "+ response.data)
+        const botTime = moment().format("h:mm");
         res.status(200).json({
-            success: true,
-            message: "Summary",
-            response: response.data
-
+            sender: "bot",
+            message: {message : response.data},
+            time: botTime
         });
     } catch (error) {
+        const botTime = moment().format("h:mm");
         const errorMessage = 
             error.response && error.response.data && error.response.data.message
                 ? error.response.data.message
                 : "Not authenticated";
         res.status(500).json({
-            success: false,
-            message: "Not able to get summary of this document",
-            error: errorMessage
+            sender: "bot",
+            message: {message : errorMessage},
+            time: botTime
         });
     }
 }

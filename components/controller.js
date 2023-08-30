@@ -78,11 +78,10 @@ function Controller() {
       );
 
       console.log("is this summary?");
-      if (response.data.success) {
-        const summary = await response.data.response;
+      if (response.status ===200) {
+        const summary = await response.data;
         console.log("this is summary " + summary);
-        const time = moment().format("h:mm");
-        const botMessage = { sender: "bot", message: summary, time };
+        const botMessage = summary;
         setMessages([...messages, botMessage]);
       } else {
         // handle errors like you did in the handleClick function
