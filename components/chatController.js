@@ -1,6 +1,7 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Loading from "./animation/loading";
 function ChatController({
   inputText,
   isLoading,
@@ -47,6 +48,7 @@ function ChatController({
     <div className="w-full h-full">
       <div className="overflow-y-auto w-full mb-40">
         {/* Conversation */}
+        {console.log(messages)}
         {messages.length == 0 && !docId ? (
           // <div className="font-bold text-8xl text-[#cccfef8c] text-center">
           // 	chat
@@ -71,7 +73,13 @@ function ChatController({
           </div>
         ) : isLoading && messages.length == 0 ? (
           // This is where you can add the content for the new condition (isLoading && messages.length == 0)
-          <div className="">// Content for isLoading and no messages</div>
+
+          <>
+            <div className="">Generating answers for you…</div>
+            <div className="chat-bubble items-center chat-bubble-primary mt-5">
+              <Loading />
+            </div>
+          </>
         ) : (
           <div className="flex flex-col justify-between h-full">
             <div className="p-6"></div>
@@ -80,14 +88,13 @@ function ChatController({
               {messages?.map((item, key) => {
                 let displayMessage = item.message;
                 let displayFileId = -1;
-                let displayFileName = "";
+                let displayFileName = "Not Available";
 
-                // Only parse bot messages
-                if (item.sender !== "me") {
-                  const parsedMessage = JSON.parse(item.message);
-                  displayMessage = parsedMessage.message;
-                  displayFileId = parsedMessage.file_id;
-                  displayFileName = parsedMessage.file_name;
+                if (item.sender === "bot") {
+                  console.log("this is chatcontroller and here is displayMessage "+ displayMessage)
+                  displayMessage = item.message.message;
+                  displayFileId = 2;
+                  displayFileName = item.message.file_name || "Not Available";
                 }
 
                 return item.sender == "me" ? (
@@ -121,11 +128,7 @@ function ChatController({
                           </time>
                         </div>
                         <div className="chat-bubble items-center chat-bubble-primary">
-                          <div className="flex space-x-3">
-                            <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce200"></div>
-                            <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce400"></div>
-                            <div className="h-2 w-2 bg-blue-500 rounded-full animate-bounce"></div>
-                          </div>
+                          <Loading />
                         </div>
                       </div>
                     </div>
@@ -133,28 +136,34 @@ function ChatController({
                   </>
                 ) : (
                   <>
-            <div className="bg-gray-100 px-20 py-5 flex" key={key}>
-                <div className="text-white">
-                    <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
-                </div>
-                <div className="chat-bubble chat-bubble-primary ml-5">
-                    {displayMessage}
-                    {displayFileId > -1 && (
+                    <div className="bg-gray-100 px-20 py-5 flex" key={key}>
+                      <div className="text-white">
+                        <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
+                      </div>
+                      <div className="ml-5">
+                        {displayMessage}
+
                         <div>
-                            File ID: {displayFileId}
-                            <br />
-                            File Name: {displayFileName}
-                        </div>
-                    )}
-                    <div>
-                        <time className="text-xs opacity-50">
+                          <time className="text-xs opacity-50">
                             {item.time}
-                        </time>
+                          </time>
+                        </div>
+                        <div className="flex text-xs ">
+                          {displayFileId > -1 && (
+                            <div className="text-sm font-bold flex items-center justify-center">
+                              Learn more :
+                              <div className="bg-indigo-600 bg-opacity-25 text-indigo-600 ml-2 rounded">
+                                <div className="text-opacity-100 px-2 py-1 ">
+                                  {displayFileName}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                </div>
-            </div>
-            <div className="border-t border-gray-300"></div>
-        </>
+                    <div className="border-t border-gray-300"></div>
+                  </>
                 );
               })}
             </div>
@@ -181,17 +190,21 @@ function ChatController({
             onKeyDown={handleEnter}
           />
         </div>
-        <div className="flex-shrink-0 h-full">
+        <div className="flex-shrink-0 h-full ">
           <button
             className={
-              "py-2 px-4 mr-4 rounded-3xl hover:bg-green-300 hover:text-white" +
+              "py-2 px-4 mr-4 rounded-3xl  hover:text-white" +
               (isLoading
                 ? " opacity-40 bg--[#2a8ce6] text-white "
                 : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
             }
             onClick={handleClick}
           >
-            <AiOutlineSend className="text-2xl " />
+            {isLoading ? (
+              <Loading className="px-1" />
+            ) : (
+              <AiOutlineSend className="text-2xl " />
+            )}
           </button>
         </div>
       </div>
