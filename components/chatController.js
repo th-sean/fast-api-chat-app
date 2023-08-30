@@ -1,5 +1,5 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 function ChatController({
   inputText,
@@ -69,40 +69,55 @@ function ChatController({
               ))}
             </div>
           </div>
+        ) : isLoading && messages.length == 0 ? (
+          // This is where you can add the content for the new condition (isLoading && messages.length == 0)
+          <div className="">// Content for isLoading and no messages</div>
         ) : (
           <div className="flex flex-col justify-between h-full">
             <div className="p-6"></div>
             <div className="border-t border-gray-300"></div>
             <div className="">
-              {messages?.map((message, key) => {
-                return message.sender == "me" ? (
+              {messages?.map((item, key) => {
+                let displayMessage = item.message;
+                let displayFileId = -1;
+                let displayFileName = "";
+
+                // Only parse bot messages
+                if (item.sender !== "me") {
+                  const parsedMessage = JSON.parse(item.message);
+                  displayMessage = parsedMessage.message;
+                  displayFileId = parsedMessage.file_id;
+                  displayFileName = parsedMessage.file_name;
+                }
+
+                return item.sender == "me" ? (
                   <>
                     <div className="bg-white px-20 py-5 flex" key={key}>
                       <div className="text-white">
                         <AiOutlineUser className="text-4xl fill-current bg-blue-400 rounded p-1" />
                       </div>
                       <div className="ml-5">
-                        {message.message}
+                        {displayMessage}
                         <div>
-                          <time className=" text-xs opacity-50">
-                            {message.time}
+                          <time className="text-xs opacity-50">
+                            {item.time}
                           </time>
                         </div>
                       </div>
                     </div>
                     <div className="border-t border-gray-300"></div>
                   </>
-                ) : message.sender == "bot-loading" && isLoading ? (
+                ) : item.sender == "bot-loading" && isLoading ? (
                   <>
                     <div className=" bg-gray-100 px-20 py-5  flex " key={key}>
                       <div className="text-white">
                         <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
                       </div>
                       <div className="chat-bubble chat-bubble-primary ml-5">
-                        {message.message}
+                        {item.message}
                         <div>
                           <time className="text-xs opacity-50">
-                            {message.time}
+                            {item.time}
                           </time>
                         </div>
                         <div className="chat-bubble items-center chat-bubble-primary">
@@ -118,22 +133,28 @@ function ChatController({
                   </>
                 ) : (
                   <>
-                    <div className=" bg-gray-100 px-20 py-5  flex" key={key}>
-                      <div className="text-white">
-                        <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
-                      </div>
-
-                      <div className="chat-bubble chat-bubble-primary ml-5">
-                        {message.message}
+            <div className="bg-gray-100 px-20 py-5 flex" key={key}>
+                <div className="text-white">
+                    <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
+                </div>
+                <div className="chat-bubble chat-bubble-primary ml-5">
+                    {displayMessage}
+                    {displayFileId > -1 && (
                         <div>
-                          <time className="text-xs opacity-50">
-                            {message.time}
-                          </time>
+                            File ID: {displayFileId}
+                            <br />
+                            File Name: {displayFileName}
                         </div>
-                      </div>
+                    )}
+                    <div>
+                        <time className="text-xs opacity-50">
+                            {item.time}
+                        </time>
                     </div>
-                    <div className="border-t border-gray-300"></div>
-                  </>
+                </div>
+            </div>
+            <div className="border-t border-gray-300"></div>
+        </>
                 );
               })}
             </div>

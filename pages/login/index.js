@@ -14,7 +14,7 @@ export default function LoginPage() {
     console.log("this is username" + username);
     console.log("this is password" + password);
     try {
-      const response = await axios.post("/api/postlogin", {
+      const response = await axios.post("/api/login/postLogin", {
         username: username,
         password: password,
       });
