@@ -23,7 +23,7 @@ function RegisterPage() {
     }
 
     try {
-      const response = await axios.post("http://54.193.180.218:8001/register", 
+      const response = await axios.post("http://54.193.180.218:8000/register", 
         {
           username: formData.username,
           password: formData.password,

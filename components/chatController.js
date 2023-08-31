@@ -45,8 +45,8 @@ function ChatController({
   };
 
   return (
-    <div className="w-full h-full">
-      <div className="overflow-y-auto w-full mb-40">
+    <div className="w-full h-full ">
+      <div className={messages.length == 0 && !docId ? "overflow-y-auto w-full mb-0" : "overflow-y-auto w-full mb-40"}>
         {/* Conversation */}
         {console.log(messages)}
         {messages.length == 0 && !docId ? (
@@ -54,8 +54,8 @@ function ChatController({
           // 	chat
           // </div>
 
-          <div className="">
-            <div className="font-bold text-7xl text-[#cccfef8c] text-center mt-10">
+          <div className="h-screen mb-0">
+            <div className="font-bold text-7xl text-[#cccfef8c] text-center pt-10">
               Chatbot-Demo
             </div>
             <div className="grid grid-cols-2 gap-4 align-center mt-20 justify-center  p-10">
@@ -75,7 +75,7 @@ function ChatController({
           // This is where you can add the content for the new condition (isLoading && messages.length == 0)
 
           <>
-            <div className="">Generating answers for you…</div>
+            <div className="mb-40">Generating answers for you…</div>
             <div className="chat-bubble items-center chat-bubble-primary mt-5">
               <Loading />
             </div>

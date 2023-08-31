@@ -29,36 +29,45 @@ function Controller() {
       message: "",
       time: sendTime,
     };
-    const messageArr = [...messages, myMessage, botLoadingMessage];
+  
+    let messageArr = [...messages, myMessage, botLoadingMessage];
     setMessages(messageArr);
     setInputText("");
-
+  
     const data = {
       message: inputText,
     };
+  
     try {
       const response = await axios.post("/api/chatbot/postBotMessage", data, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
       });
-      messageArr.pop();
+  
+      messageArr.pop(); // Remove loading message
+  
       if (response.status === 200) {
         const botMessage = response.data;
         console.log("this is bot controller " + botMessage);
         messageArr.push(botMessage);
-        setMessages(messageArr);
       } else if (response.status === 401) {
         window.alert("Please login first");
       } else if (response.status === 400) {
         window.alert(response.data.detail);
-      } else {
-        window.alert("An error occurred.");
-      }
+      } 
     } catch (error) {
+      messageArr.pop(); // Remove loading message
+      const errorMessage = {
+        sender: "bot",
+        message: {message: error.message,},
+        time: sendTime,
+      };
+      messageArr.push(errorMessage);
       console.error(error);
     }
-
+  
+    setMessages(messageArr);
     setIsLoading(false);
   };
 
@@ -93,7 +102,7 @@ function Controller() {
   };
 
   const handleRefresh = async () => {
-    await fetch("http://54.193.180.218:8001/clear_chat_history", {
+    await fetch("http://54.193.180.218:8000/clear_chat_history", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

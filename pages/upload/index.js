@@ -15,14 +15,14 @@ function UploadPage() {
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [fileIdToDelete, setFileIdToDelete] = useState(null);
+  const [fileIdSelected, setFileIdSelected] = useState(null);
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
   const [PromptModalBody, setPromptModalBody] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [deleteProgress, setDeleteProgress] = useState(0)
-
+  const [deleteProgress, setDeleteProgress] = useState(0);
+  const [blobURL, setBlobURL] = useState(null);
   const [showUploadDropdown, setShowUploadDropdown] = useState(false);
   const [showKebabDropdown, setShowKebabDropdown] = useState(false);
   const dropdownUploadRef = useRef(false);
@@ -30,9 +30,13 @@ function UploadPage() {
   const router = useRouter();
 
   const openDeleteModal = (item, fileId) => {
-    setFileIdToDelete(fileId);
+    setFileIdSelected(fileId);
     setFileInfoToDelete(item);
     setIsDeleteModalOpen(true);
+  };
+
+  const openDownloadModal = (fileId) => {
+    setFileIdSelected(fileId);
   };
   const popupClassNames = `
   fixed
@@ -120,21 +124,15 @@ function UploadPage() {
 
     const formData = new FormData();
     formData.append("file", file[0]);
-    console.log()
-    const response = await axios.post(
-      "/api/upload/postFileUpload",
-      formData,
-      {
-        headers: {
-          "Authorization": `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-        onUploadProgress: (progressEvent) => {
-          setUploadProgress(progressEvent);
-        },
-      
+    console.log();
+    const response = await axios.post("/api/upload/postFileUpload", formData, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
       },
-  
-    );
+      onUploadProgress: (progressEvent) => {
+        setUploadProgress(progressEvent);
+      },
+    });
 
     if (response.data.success) {
       getDocumentsList();
@@ -159,20 +157,52 @@ function UploadPage() {
         },
       });
       setDocumentList(response.data.response);
- 
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
+  async function downloadDocument() {
+    const selectedId = fileIdSelected;
+    console.log("this is delete document id" + selectedId);
+    try {
+      const response = await axios.post(
+        `/api/upload/getDownloadDocument`,
+        { selectedId: selectedId },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          responseType: "arraybuffer"
+        }
+      );
+      // Convert the blob data into a blob URL
+      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const blobURL = URL.createObjectURL(blob);
+
+      // Open the blob URL in a new browser tab
+      window.open(blobURL, "_blank");
+
+      console.log("download Link created ", blobURL);
+
+      if (response.status === 200) {
+        console.log("Document Opened");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+    setIsDeleteModalOpen(false);
+    setShowKebabDropdown(false)
+  }
 
   function redirectToChatbot(file_id) {
-    const documentId = file_id; // Replace with how you retrieve the ID
+    const documentId = file_id;
     router.push(`/chatbot?docId=${documentId}`);
   }
 
   async function deleteDocument() {
-    const selectedId = fileIdToDelete
-    console.log("this is delete document id" + selectedId)
+    const selectedId = fileIdSelected;
+    console.log("this is delete document id" + selectedId);
     try {
       const response = await axios.post(
         `/api/upload/getDeleteDocument`,
@@ -185,28 +215,19 @@ function UploadPage() {
           onDeleteProgress: (progressEvent) => {
             setDeleteProgress(progressEvent);
           },
-        },
-        
+        }
       );
       console.log("this is response ", response.data);
 
-      if (response.data.success) {
+      if (response.status === 200) {
         console.log("Deleted document");
-
-        // // Show the popup with the success message
-        // setPopupMessage("Successfully deleted!");
-        // setShowPopup(true);
-
-        // // Set a timeout to hide the popup after 3 seconds
-        // setTimeout(() => {
-        //   setShowPopup(false);
-        // }, 3000);
         getDocumentsList();
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
     setIsDeleteModalOpen(false);
+    setShowKebabDropdown(false)
   }
 
   return (
@@ -256,32 +277,6 @@ function UploadPage() {
           </div>
 
           <div className="mt-3">
-            {/* <div className="flex items-center mt-5">
-            <div className="border border-gray-300 h-[1px] w-full mr-3"> </div>
-            <div className ="font-medium">Preview</div>
-            <div className="border border-gray-300 h-[1px] w-full ml-3"></div>
-          </div> */}
-
-            {/* {fileUpload ? (
-            <div className="inline-flex items-center px-4 py-2 text-black border-1 rounded-lg cursor-pointer w-full ">
-              <FcDownload className="text-lg mr-3" />
-              <a
-                class="no-underline"
-                target="_blank"
-                href={URL.createObjectURL(fileUpload)}
-              >
-                {fileUpload.name}
-              </a>
-              <div className="ml-auto">
-                {(fileUpload.size / 1048576).toFixed(2)} MB
-              </div>
-            </div>
-          ) : (
-            <div className="inline-flex items-center px-4 py-2 text-black border-1 rounded-lg text-center w-full justify-center">
-              {" "}
-              Preview Not avaiable
-            </div>
-          )} */}
           </div>
           <div className="w-full md:w-1/3 relative mt-2 md:mt-0 ">
             {/* Input Field */}
@@ -315,7 +310,7 @@ function UploadPage() {
         </Modal>
       </div>
       <hr></hr>
-      <div className="bg-white p-5 rounded-lg mt-4">
+      <div className="bg-white p-5 rounded-lg mt-4 mb-20">
         <div>
           <div className="text-lg font-bold p-2 ">
             {documentList.length} Files Found
@@ -340,8 +335,14 @@ function UploadPage() {
                     className="absolute top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
                   >
                     <ul>
-                      <li className="p-2 hover:bg-gray-100 cursor-pointer">
-                        Download
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          downloadDocument();
+                          openDownloadModal(item.id);
+                        }}
+                      >
+                        <a href={blobURL}></a>Download
                       </li>
                       <li
                         className="p-2 hover:bg-gray-100 cursor-pointer"

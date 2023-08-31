@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://54.193.180.218:8001";  // The address of your external server
+const baseURL = "http://54.193.180.218:8000";  // The address of your external server
 
 export const config = {
   api: {

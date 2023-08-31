@@ -4,9 +4,9 @@ export default async function handler(req, res) {
     const token = req.headers.authorization.split(" ")[1];
     console.log("this is token "+token)
     const {selectedId}  = req.body
-    console.log("this is selected id" + selectedId)
+    console.log("this is selected id " + selectedId)
     try {
-        const response = await axios.get(`http://54.193.180.218:8001/delete_file/${selectedId}`, {
+        const response = await axios.get(`http://54.193.180.218:8000/delete_file/${selectedId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 // async function deleteDocument() {
 //     try {
 //       const response = await axios.get(
-//         `http://54.193.180.218:8001/delete_file/${fileIdToDelete}`,
+//         `http://54.193.180.218:8000/delete_file/${fileIdSelected}`,
 //         {
 //           headers: {
 //             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
