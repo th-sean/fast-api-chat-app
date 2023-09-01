@@ -20,6 +20,7 @@ export default async function handler(req, res) {
     });
     console.log("this is message" + response.data)
     if (response.status === 200) {
+      
       const botTime = moment().format("h:mm");
       const botMessage = {
         sender: "bot",

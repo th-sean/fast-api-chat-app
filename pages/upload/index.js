@@ -29,26 +29,21 @@ function UploadPage() {
   const dropdownKebabRef = useRef(false);
   const router = useRouter();
 
-  const openDeleteModal = (item, fileId) => {
+  const openFileOptionModal = (item, fileId) => {
     setFileIdSelected(fileId);
     setFileInfoToDelete(item);
-    setIsDeleteModalOpen(true);
-  };
-
-  const openDownloadModal = (fileId) => {
-    setFileIdSelected(fileId);
   };
   const popupClassNames = `
   fixed
-  bottom-4         // 1rem from the bottom
-  right-4          // 1rem from the right
-  w-2/3           // Popup width set to 1/3 of the screen width
+  bottom-4         
+  right-4         
+  w-2/3          
   lg:w-1/4
-  p-4              // Padding all around
-  bg-white         // White background color
-  border           // Add a border
-  rounded-lg       // Large rounded corners
-  shadow-xl        // Large shadow for a prominent elevation effect
+  p-4              
+  bg-white         
+  border           
+  rounded-lg       
+  shadow-xl        
 `;
   // const modules = {
   //   toolbar: [
@@ -173,11 +168,13 @@ function UploadPage() {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
           },
-          responseType: "arraybuffer"
+          responseType: "arraybuffer",
         }
       );
       // Convert the blob data into a blob URL
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
       const blobURL = URL.createObjectURL(blob);
 
       // Open the blob URL in a new browser tab
@@ -192,7 +189,7 @@ function UploadPage() {
       console.error("Error fetching user data:", error);
     }
     setIsDeleteModalOpen(false);
-    setShowKebabDropdown(false)
+    setShowKebabDropdown(false);
   }
 
   function redirectToChatbot(file_id) {
@@ -227,7 +224,7 @@ function UploadPage() {
       console.error("Error fetching user data:", error);
     }
     setIsDeleteModalOpen(false);
-    setShowKebabDropdown(false)
+    setShowKebabDropdown(false);
   }
 
   return (
@@ -276,8 +273,7 @@ function UploadPage() {
             )}
           </div>
 
-          <div className="mt-3">
-          </div>
+          <div className="mt-3"></div>
           <div className="w-full md:w-1/3 relative mt-2 md:mt-0 ">
             {/* Input Field */}
             <input
@@ -339,7 +335,7 @@ function UploadPage() {
                         className="p-2 hover:bg-gray-100 cursor-pointer"
                         onClick={() => {
                           downloadDocument();
-                          openDownloadModal(item.id);
+                          openFileOptionModal(item, item.id);
                         }}
                       >
                         <a href={blobURL}></a>Download
@@ -352,7 +348,10 @@ function UploadPage() {
                       </li>
                       <li
                         className="p-2 text-white rounded-lg bg-red-500 hover:bg-red-600 cursor-pointer"
-                        onClick={() => openDeleteModal(item, item.id)}
+                        onClick={() => {
+                          openFileOptionModal(item, item.id);
+                          setIsDeleteModalOpen(true);
+                        }}
                       >
                         Delete
                         <Modal
@@ -392,7 +391,9 @@ function UploadPage() {
         </div>
       </div>
       {showPopup && (
-        <div className={popupClassNames}>
+        <div
+          className=" fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl"
+        >
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold overflow-hidden truncate">
               {uploadProgress.progress === 1

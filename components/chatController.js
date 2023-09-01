@@ -6,10 +6,8 @@ function ChatController({
   inputText,
   isLoading,
   messages,
-  setIsSideBarOpen,
   setInputText,
   handleClick,
-  handleRefresh,
 }) {
   const router = useRouter();
   const { docId } = router.query;
@@ -45,14 +43,11 @@ function ChatController({
   };
 
   return (
-    <div className="w-full h-full ">
-      <div className={messages.length == 0 && !docId ? "overflow-y-auto w-full mb-0" : "overflow-y-auto w-full mb-40"}>
+    <div className="w-full">
+      <div className={messages.length == 0 && !docId ? "w-full mb-0" : " w-full mb-40"}>
         {/* Conversation */}
         {console.log(messages)}
         {messages.length == 0 && !docId ? (
-          // <div className="font-bold text-8xl text-[#cccfef8c] text-center">
-          // 	chat
-          // </div>
 
           <div className="h-screen mb-0">
             <div className="font-bold text-7xl text-[#cccfef8c] text-center pt-10">
@@ -74,12 +69,11 @@ function ChatController({
         ) : isLoading && messages.length == 0 ? (
           // This is where you can add the content for the new condition (isLoading && messages.length == 0)
 
-          <>
-            <div className="mb-40">Generating answers for you…</div>
-            <div className="chat-bubble items-center chat-bubble-primary mt-5">
-              <Loading />
-            </div>
-          </>
+          <div className="flex mt-20 w-full items-center justify-center">
+            <Loading className="" />
+            <div className="">Generating answers for you…</div>
+            
+          </div>
         ) : (
           <div className="flex flex-col justify-between h-full">
             <div className="p-6"></div>
@@ -208,6 +202,7 @@ function ChatController({
           </button>
         </div>
       </div>
+      <div className="pb-1"></div>
     </div>
   );
 }

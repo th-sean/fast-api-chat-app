@@ -127,7 +127,7 @@ function Controller() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full lg:h-[calc(100%-258px)]">
       <ChatController
         inputText={inputText}
         isLoading={isLoading}
