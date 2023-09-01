@@ -10,7 +10,7 @@ export const config = {
 
 async function handler(req, res) {
   const token = req.headers.authorization.split(' ')[1]; // Extracting token for authorization
-
+  console.log("check this req"+req)
   let uploadPhotoAddress = baseURL + "/uploadfile";  // The endpoint on your external server
 
   if (req.method === "POST") {
@@ -21,6 +21,7 @@ async function handler(req, res) {
         "Authorization": `Bearer ${token}`  // Set the authorization header
       },
     };
+    
 
     try {
       const { data } = await axios.post(uploadPhotoAddress, req, axiosConfig);

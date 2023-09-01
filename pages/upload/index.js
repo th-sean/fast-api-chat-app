@@ -33,25 +33,7 @@ function UploadPage() {
     setFileIdSelected(fileId);
     setFileInfoToDelete(item);
   };
-  const popupClassNames = `
-  fixed
-  bottom-4         
-  right-4         
-  w-2/3          
-  lg:w-1/4
-  p-4              
-  bg-white         
-  border           
-  rounded-lg       
-  shadow-xl        
-`;
-  // const modules = {
-  //   toolbar: [
-  //     [{ font: [] }],
-  //     [{ size: ["small", false, "large", "huge"] }],
-  //     [{ color: [] }, { background: [] }],
-  //   ],
-  // };
+ 
   const [showPopup, setShowPopup] = useState(false);
   const fileInput = useRef(null);
 
@@ -84,10 +66,13 @@ function UploadPage() {
   }
 
   function handleChange(e) {
-    const fileUploaded = e.target.files;
-    if (!fileUploaded) return;
-    setFileUpload(fileUploaded);
-    handleFileUpload(fileUploaded);
+    const filesUploaded = e.target.files;
+    console.log("this is what you get", filesUploaded);  // Modified this line
+    if (!filesUploaded || filesUploaded.length === 0) return;  // Added length check
+    const fileArray = Array.from(filesUploaded); // Convert FileList to Array
+    console.log("this is what you get 2", fileArray)
+    setFileUpload(fileArray);
+    handleFileUpload(fileArray);
     setShowPopup(true);
     setShowUploadDropdown(null);
   }
@@ -112,27 +97,32 @@ function UploadPage() {
     setShowUploadDropdown(false);
   };
 
-  async function handleFileUpload(file) {
-    if (!file) return;
+  async function handleFileUpload(files) {
+    const fileArray = Array.from(files); // Convert FileList to Array
+    if (!fileArray || fileArray.length === 0) return;
 
     setUploading(true);
 
     const formData = new FormData();
-    formData.append("file", file[0]);
-    console.log();
-    const response = await axios.post("/api/upload/postFileUpload", formData, {
+    fileArray.forEach((file) => {
+      console.log("this is real file"+file)
+      formData.append(`files`, file);
+    });
+    console.log("upload document triggered")
+    const response = await axios.post("/api/upload/postFilesUpload", formData, {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
       },
-      onUploadProgress: (progressEvent) => {
-        setUploadProgress(progressEvent);
-      },
+      // onUploadProgress: (progressEvent) => {
+      //   setUploadProgress(progressEvent);
+      // },
     });
 
-    if (response.data.success) {
+    if (response.status === 200) {
       getDocumentsList();
     } else {
       setUploadProgress(-1);
+      console.log("unsuccessful")
     }
 
     setUploading(false);
@@ -260,6 +250,7 @@ function UploadPage() {
                       ref={fileInput}
                       onChange={handleChange}
                       style={{ display: "none" }}
+                      multiple
                     ></input>
                   </li>
                   <li
@@ -391,9 +382,7 @@ function UploadPage() {
         </div>
       </div>
       {showPopup && (
-        <div
-          className=" fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl"
-        >
+        <div className=" fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold overflow-hidden truncate">
               {uploadProgress.progress === 1
