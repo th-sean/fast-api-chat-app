@@ -19,7 +19,7 @@ function UploadPage() {
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
   const [PromptModalBody, setPromptModalBody] = useState("");
-  const [uploadStatus, setUploadStatus] = useState('');
+  const [uploadStatus, setUploadStatus] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deleteProgress, setDeleteProgress] = useState(0)
   const [showPopup, setShowPopup] = useState(false);
@@ -138,7 +138,7 @@ function UploadPage() {
       setUploadProgress(-1);
     }
 
-    setUploading(false);
+    setUploadStatus(false);
     getDocumentsList();
   }
 
@@ -419,7 +419,7 @@ function UploadPage() {
             <h2 className="text-xl font-bold overflow-hidden truncate">
             {uploadProgress.progress === 1
                 ? "Completed"
-                : uploading
+                : uploadStatus
                 ? `Uploading... ${Math.round(uploadProgress.progress * 100)}%`
                 : "Failed to upload"}
             </h2>
