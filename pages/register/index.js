@@ -36,7 +36,7 @@ function RegisterPage() {
 
       // Assuming a successful response means the user has been registered
       setMessage(response.data.message);
-
+      window.location.href = "/login";
       // You can return or process the response if needed
       return response.data;
     } catch (error) {
