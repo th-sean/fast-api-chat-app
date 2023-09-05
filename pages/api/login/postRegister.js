@@ -23,8 +23,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       success: true,
-      message: "Register successfully!",
-      
+      message: response.data.msg
     });
   } catch (error) {
     const errorMessage =
@@ -33,7 +32,7 @@ export default async function handler(req, res) {
         : error.message || "An error occurred during login.";
     res.status(500).json({
       success: false,
-      message: errorMessage,
+      message: response.data.msg,
     });
   }
 }
