@@ -278,34 +278,6 @@ function UploadPage() {
             )}
           </div>
 
-          <div className="mt-3">
-            {/* <div className="flex items-center mt-5">
-            <div className="border border-gray-300 h-[1px] w-full mr-3"> </div>
-            <div className ="font-medium">Preview</div>
-            <div className="border border-gray-300 h-[1px] w-full ml-3"></div>
-          </div> */}
-
-            {/* {fileUpload ? (
-            <div className="inline-flex items-center px-4 py-2 text-black border-1 rounded-lg cursor-pointer w-full ">
-              <FcDownload className="text-lg mr-3" />
-              <a
-                class="no-underline"
-                target="_blank"
-                href={URL.createObjectURL(fileUpload)}
-              >
-                {fileUpload.name}
-              </a>
-              <div className="ml-auto">
-                {(fileUpload.size / 1048576).toFixed(2)} MB
-              </div>
-            </div>
-          ) : (
-            <div className="inline-flex items-center px-4 py-2 text-black border-1 rounded-lg text-center w-full justify-center">
-              {" "}
-              Preview Not avaiable
-            </div>
-          )} */}
-          </div>
           <div className="w-full md:w-1/3 relative mt-2 md:mt-0 ">
             {/* Input Field */}
             <input

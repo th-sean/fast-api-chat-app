@@ -23,16 +23,18 @@ function RegisterPage() {
     }
 
     try {
-      const response = await axios.post("/api/login/postRegister", 
+      const response = await axios.post(
+        "/api/login/postRegister",
         {
           username: formData.username,
           password: formData.password,
-        },{
-        headers: {
-          "Content-Type": "application/json",
         },
-        
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       // Assuming a successful response means the user has been registered
       setMessage(response.data.message);
