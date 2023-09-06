@@ -6,6 +6,7 @@ import { BsUpload, BsFilter } from "react-icons/bs";
 import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
+import Spinner from "../../components/animation/spinner";
 
 // import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
@@ -19,9 +20,10 @@ function UploadPage() {
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
   const [PromptModalBody, setPromptModalBody] = useState("");
-  const [uploadStatus, setUploadStatus] = useState(false);
+  const [deleteStatus, setDeleteStatus] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [deleteProgress, setDeleteProgress] = useState(0)
+
   const [showPopup, setShowPopup] = useState(false);
   const fileInput = useRef(null);
   const [showUploadDropdown, setShowUploadDropdown] = useState(false);
@@ -36,24 +38,10 @@ function UploadPage() {
     setIsDeleteModalOpen(true);
   };
 
-
-
   const [editorContent, setEditorContent] = useState("");
 
-  const popupClassNames = `
-  fixed
-  bottom-4         // 1rem from the bottom
-  right-4          // 1rem from the right
-  w-2/3           // Popup width set to 1/3 of the screen width
-  lg:w-1/4
-  p-4              // Padding all around
-  bg-white         // White background color
-  border           // Add a border
-  rounded-lg       // Large rounded corners
-  shadow-xl        // Large shadow for a prominent elevation effect
-`;
   useEffect(() => {
-    getDocumentsList();
+    fetchUploadedDocuments();
     const handleClickOutside = (event) => {
       const isOutsideUploadDropdown =
         showUploadDropdown &&
@@ -110,126 +98,102 @@ function UploadPage() {
   async function handleFileUpload(file) {
     if (!file) return;
 
-    setUploadStatus(true);
+    setUploadStatus("in-progress");
 
     const formData = new FormData();
     formData.append("file", file[0]);
-    console.log()
-    const response = await axios.post(
-      "/api/upload/postFileUpload",
-      formData,
-      {
-        headers: {
-          "Authorization": `Bearer ${sessionStorage.getItem("accessToken")}`,
-        },
-        onUploadProgress: (progressEvent) => {
-          setUploadProgress(progressEvent);
-          
-        },
-      
+    console.log();
+    const response = await axios.post("/api/upload/postFileUpload", formData, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
       },
-  
-    );
+      onUploadProgress: (progressEvent) => {
+        setUploadProgress(progressEvent);
+      },
+    });
 
-    if (response.data.success) {
-      getDocumentsList();
+    if (response.status === 200) {
+      setUploadStatus("completed");
+      console.log("upload completed");
+      fetchUploadedDocuments();
     } else {
-     
+      setUploadStatus("failed");
+      console.log("fetching document");
+      fetchUploadedDocuments();
       setUploadProgress(-1);
     }
-
-    setUploadStatus(false);
-    getDocumentsList();
   }
 
   async function handlePromptSubmit() {}
 
-  async function getDocumentsList() {
+  async function fetchUploadedDocuments() {
     console.log("Get documentList");
+    const response = await axios.get("/api/upload/getDocumentsList", {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      setDocumentList(response.data.response);
+    } else {
+      console.log("failed to fetch");
+    }
+  }
 
-    try {
-      const response = await axios.get("/api/upload/getDocumentsList", {
+  async function getDownloadDocument() {
+    const selectedId = fileIdToDelete;
+    console.log("this is download document id" + selectedId);
+    const response = await axios.post(
+      `/api/upload/postFileDownload`,
+      { selectedId: selectedId },
+      {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
           "Content-Type": "application/json",
         },
-      });
-      setDocumentList(response.data.response);
- 
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+      }
+    );
+    console.log("this is response ", response.data);
+
+    if (response.status === 200) {
+      setIsDeleteModalOpen(false);
+    } else {
+      setIsDeleteModalOpen(false);
+    }
+  }
+
+  async function deleteDocument() {
+    const selectedId = fileIdToDelete;
+    setDeleteStatus("in-progress");
+    console.log("this is delete document id" + selectedId);
+
+    const response = await axios.post(
+      `/api/upload/getDeleteDocument`,
+      { selectedId: selectedId },
+      {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("this is response ", response.data);
+    
+    if (response.status === 200) {
+      console.log("Deleted document");
+      setDeleteStatus("complete");
+      fetchUploadedDocuments();
+      setIsDeleteModalOpen(false);
+    } else {
+      setDeleteStatus("complete");
+      setIsDeleteModalOpen(false);
     }
   }
 
   function redirectToChatbot(file_id) {
     const documentId = file_id; // Replace with how you retrieve the ID
     router.push(`/chatbot?docId=${documentId}`);
-  }
-  
-  async function getDownloadDocument() {
-    const selectedId = fileIdToDelete
-    console.log("this is download document id" + selectedId)
-    try {
-      const response = await axios.post(
-        `/api/upload/postFileDownload`,
-        { selectedId: selectedId },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          }
-        },
-        
-      );
-      console.log("this is response ", response.data);
-
-      if (response.status === 200) {
-        
-        
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-    setIsDeleteModalOpen(false);
-  }
-
-  async function deleteDocument() {
-    const selectedId = fileIdToDelete
-    console.log("this is delete document id" + selectedId)
-    try {
-      const response = await axios.post(
-        `/api/upload/getDeleteDocument`,
-        { selectedId: selectedId },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-          onDeleteProgress: (progressEvent) => {
-            setDeleteProgress(progressEvent);
-          },
-        },
-        
-      );
-      console.log("this is response ", response.data);
-
-      if (response.data.success) {
-        console.log("Deleted document");
-
-        // // Show the popup with the success message
-        // setPopupMessage("Successfully deleted!");
-        // setShowPopup(true);
-
-        // // Set a timeout to hide the popup after 3 seconds
-        // setTimeout(() => {
-        //   setShowPopup(false);
-        // }, 3000);
-        getDocumentsList();
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-    setIsDeleteModalOpen(false);
   }
 
   return (
@@ -335,7 +299,10 @@ function UploadPage() {
                     className="absolute top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
                   >
                     <ul>
-                      <li className="p-2 hover:bg-gray-100 cursor-pointer" onClick={()=>getDownloadDocument()}>
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => getDownloadDocument()}
+                      >
                         Download
                       </li>
                       <li
@@ -373,7 +340,16 @@ function UploadPage() {
                               onClick={deleteDocument}
                               className="bg-red-500 text-white px-4 py-2 rounded"
                             >
-                              Delete
+                              {deleteStatus === "completed" ? (
+                                "Completed"
+                              ) : deleteStatus === "in-progress" ? (
+                                <div className="flex items-center justify-center">
+                                  <Spinner className="" size={`w-5 h-5`} />{" "}
+                                  <div className="ml-1">Deleting</div>{" "}
+                                </div>
+                              ) : (
+                                "Delete"
+                              )}
                             </button>
                           </div>
                         </Modal>
@@ -389,11 +365,16 @@ function UploadPage() {
         <div className="fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold overflow-hidden truncate">
-            {uploadProgress.progress === 1
-                ? "Completed"
-                : uploadStatus
-                ? `Uploading... ${Math.round(uploadProgress.progress * 100)}%`
-                : "Failed to upload"}
+              {uploadStatus === "completed" ? (
+                "Completed"
+              ) : uploadStatus === "in-progress" ? (
+                <div className="flex items-center justify-center">
+                  <Spinner className="" size={`w-5 h-5`} />{" "}
+                  <div className="ml-1 text-xl">Uploading</div>{" "}
+                </div>
+              ) : (
+                "Failed to upload"
+              )}
             </h2>
             <button
               onClick={() => setShowPopup(false)}
