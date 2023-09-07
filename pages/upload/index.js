@@ -15,7 +15,7 @@ function UploadPage() {
   const [fileUpload, setFileUpload] = useState(null);
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteConfirmOpen] = useState(false);
   const [fileIdToDelete, setFileIdToDelete] = useState(null);
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
@@ -35,7 +35,7 @@ function UploadPage() {
   const openDeleteModal = (item, fileId) => {
     setFileIdToDelete(fileId);
     setFileInfoToDelete(item);
-    setIsDeleteModalOpen(true);
+    setDeleteConfirmOpen(true);
   };
 
   const [editorContent, setEditorContent] = useState("");
@@ -144,6 +144,7 @@ function UploadPage() {
   async function getDownloadDocument() {
     const selectedId = fileIdToDelete;
     console.log("this is download document id" + selectedId);
+
     const response = await axios.post(
       `/api/upload/postFileDownload`,
       { selectedId: selectedId },
@@ -157,9 +158,7 @@ function UploadPage() {
     console.log("this is response ", response.data);
 
     if (response.status === 200) {
-      setIsDeleteModalOpen(false);
     } else {
-      setIsDeleteModalOpen(false);
     }
   }
 
@@ -167,27 +166,34 @@ function UploadPage() {
     const selectedId = fileIdToDelete;
     setDeleteStatus("in-progress");
     console.log("this is delete document id" + selectedId);
+    try {
+      const response = await axios.post(
+        `/api/upload/getDeleteDocument`,
+        { selectedId: selectedId },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("this is response ", response.data);
 
-    const response = await axios.post(
-      `/api/upload/getDeleteDocument`,
-      { selectedId: selectedId },
-      {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
+      if (response.status === 200) {
+        console.log("Deleted document");
+        setDeleteStatus("complete");
+        fetchUploadedDocuments();
+        setDeleteConfirmOpen(false);
+      } else {
+        console.log("it is not 200")
+        setDeleteStatus("complete");
+        setDeleteConfirmOpen(false);
       }
-    );
-    console.log("this is response ", response.data);
-
-    if (response.status === 200) {
-      console.log("Deleted document");
+    } catch (error) {
+      console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
-      fetchUploadedDocuments();
-      setIsDeleteModalOpen(false);
-    } else {
-      setDeleteStatus("complete");
-      setIsDeleteModalOpen(false);
+      setDeleteConfirmOpen(false);
+      alert('Failed to Delete File.');
     }
   }
 
@@ -319,7 +325,7 @@ function UploadPage() {
                         <Modal
                           className="modal"
                           isOpen={isDeleteModalOpen}
-                          onRequestClose={() => setIsDeleteModalOpen(false)}
+                          // onRequestClose={() => setDeleteConfirmOpen(false)}
                           overlayClassName="modal-overlay"
                         >
                           <h2 className="text-lg font-bold">
@@ -331,7 +337,7 @@ function UploadPage() {
                           </p>
                           <div className="flex justify-end mt-5">
                             <button
-                              onClick={() => setIsDeleteModalOpen(false)}
+                              onClick={() => setDeleteConfirmOpen(false)}
                               className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
                             >
                               Cancel
