@@ -2,6 +2,8 @@ import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Loading from "./animation/loading";
+import ScrollButton from "./scrollBottom";
+
 function ChatController({
   inputText,
   isLoading,
@@ -44,11 +46,14 @@ function ChatController({
 
   return (
     <div className="w-full">
-      <div className={messages.length == 0 && !docId ? "w-full mb-0" : " w-full mb-40"}>
+      <div
+        className={
+          messages.length == 0 && !docId ? "w-full mb-0" : " w-full mb-40"
+        }
+      >
         {/* Conversation */}
         {console.log(messages)}
         {messages.length == 0 && !docId ? (
-
           <div className="h-screen mb-0">
             <div className="font-bold text-7xl text-[#cccfef8c] text-center pt-10">
               Chatbot-Demo
@@ -72,7 +77,6 @@ function ChatController({
           <div className="flex mt-20 w-full items-center justify-center">
             <Loading className="" />
             <div className="">Generating answers for you…</div>
-            
           </div>
         ) : (
           <div className="flex flex-col justify-between h-full">
@@ -85,7 +89,10 @@ function ChatController({
                 let displayFileName = "Not Available";
 
                 if (item.sender === "bot") {
-                  console.log("this is chatcontroller and here is displayMessage "+ displayMessage)
+                  console.log(
+                    "this is chatcontroller and here is displayMessage " +
+                      displayMessage
+                  );
                   displayMessage = item.message.message;
                   displayFileId = item.message.file_id;
                   displayFileName = item.message.file_name || "Not Available";
@@ -166,7 +173,7 @@ function ChatController({
       </div>
 
       <div
-        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 p-4  items-center "
+        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 px-4  items-center "
         style={{
           background:
             "linear-gradient(rgba(255,255,255,0), rgba(220, 220, 220,1))",
@@ -184,10 +191,10 @@ function ChatController({
             onKeyDown={handleEnter}
           />
         </div>
-        <div className="flex-shrink-0 h-full ">
+        <div className="flex-shrink-0 h-full">
           <button
             className={
-              "py-2 px-4 mr-4 rounded-3xl  hover:text-white" +
+              "py-2 px-4 mr-4 rounded-3xl items-center justify-center hover:text-white" +
               (isLoading
                 ? " opacity-40 bg--[#2a8ce6] text-white "
                 : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
@@ -200,6 +207,11 @@ function ChatController({
               <AiOutlineSend className="text-2xl " />
             )}
           </button>
+          
+        </div>
+        <div className="relative bottom-20 right-10 text-xl">
+         hi
+         <ScrollButton/>
         </div>
       </div>
       <div className="pb-1"></div>
