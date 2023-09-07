@@ -1,13 +1,17 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
-import React, { useState, useEffect } from "react";
+import { BsTrash } from "react-icons/bs";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Loading from "./animation/loading";
+import ScrollButton from "./scrollBottom";
+
 function ChatController({
   inputText,
   isLoading,
   messages,
   setInputText,
   handleClick,
+  handleRefresh,
 }) {
   const router = useRouter();
   const { docId } = router.query;
@@ -41,14 +45,24 @@ function ChatController({
   const handleHandleInstruction = (itemText) => () => {
     setInputText(itemText);
   };
+  const messagesEndRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+  useEffect(() => {
+    scrollToBottom;
+  }, [messages]);
 
   return (
     <div className="w-full">
-      <div className={messages.length == 0 && !docId ? "w-full mb-0" : " w-full mb-40"}>
+      <div
+        className={
+          messages.length == 0 && !docId ? "w-full mb-0" : " w-full mb-40"
+        }
+      >
         {/* Conversation */}
         {console.log(messages)}
         {messages.length == 0 && !docId ? (
-
           <div className="h-screen mb-0">
             <div className="font-bold text-7xl text-[#cccfef8c] text-center pt-10">
               Chatbot-Demo
@@ -72,7 +86,6 @@ function ChatController({
           <div className="flex mt-20 w-full items-center justify-center">
             <Loading className="" />
             <div className="">Generating answers for you…</div>
-            
           </div>
         ) : (
           <div className="flex flex-col justify-between h-full">
@@ -85,7 +98,10 @@ function ChatController({
                 let displayFileName = "Not Available";
 
                 if (item.sender === "bot") {
-                  console.log("this is chatcontroller and here is displayMessage "+ displayMessage)
+                  console.log(
+                    "this is chatcontroller and here is displayMessage " +
+                      displayMessage
+                  );
                   displayMessage = item.message.message;
                   displayFileId = item.message.file_id;
                   displayFileName = item.message.file_name || "Not Available";
@@ -166,16 +182,22 @@ function ChatController({
       </div>
 
       <div
-        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 p-4  items-center "
+        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacity-bottom-0 absolute bottom-0 px-4 items-center"
         style={{
           background:
             "linear-gradient(rgba(255,255,255,0), rgba(220, 220, 220,1))",
         }}
       >
+        {/* Clear Button */}
+        <div className="mx-1 flex-shrink-0 px-4 py-3 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] opacity-80 text-white rounded-3xl" onClick={handleRefresh}>
+          <BsTrash className="text-xl text-2xl mx-1"/>
+        </div>
+
+        {/* Textarea/Input Box */}
         <div className="flex-grow px-4 py-3">
           <textarea
             rows="1"
-            className="w-full border p-4 rounded-xl focus:border-blue-400 focus:outline-none "
+            className="w-full border p-4 rounded-xl focus:border-blue-400 focus:outline-none"
             placeholder={
               isLoading ? "Wait a second...." : "Type your message..."
             }
@@ -184,12 +206,14 @@ function ChatController({
             onKeyDown={handleEnter}
           />
         </div>
-        <div className="flex-shrink-0 h-full ">
+
+        {/* Submit Button */}
+        <div className="flex-shrink-0 h-full px-4 py-3">
           <button
             className={
-              "py-2 px-4 mr-4 rounded-3xl  hover:text-white" +
+              "py-2 px-4 rounded-3xl items-center justify-center hover:text-white" +
               (isLoading
-                ? " opacity-40 bg--[#2a8ce6] text-white "
+                ? " opacity-40 text-white "
                 : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
             }
             onClick={handleClick}
@@ -197,12 +221,12 @@ function ChatController({
             {isLoading ? (
               <Loading className="px-1" />
             ) : (
-              <AiOutlineSend className="text-2xl " />
+              <AiOutlineSend className="text-2xl" />
             )}
           </button>
         </div>
       </div>
-      <div className="pb-1"></div>
+      <div ref={messagesEndRef} />
     </div>
   );
 }
