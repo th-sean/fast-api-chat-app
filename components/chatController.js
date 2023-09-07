@@ -1,5 +1,5 @@
 import { AiOutlineSend, AiOutlineRobot, AiOutlineUser } from "react-icons/ai";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { useRouter } from "next/router";
 import Loading from "./animation/loading";
 import ScrollButton from "./scrollBottom";
@@ -10,6 +10,7 @@ function ChatController({
   messages,
   setInputText,
   handleClick,
+  handleRefresh,
 }) {
   const router = useRouter();
   const { docId } = router.query;
@@ -43,6 +44,13 @@ function ChatController({
   const handleHandleInstruction = (itemText) => () => {
     setInputText(itemText);
   };
+  const messagesEndRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+  useEffect(()=>{
+    scrollToBottom
+  },[messages])
 
   return (
     <div className="w-full">
@@ -173,13 +181,14 @@ function ChatController({
       </div>
 
       <div
-        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 px-4  items-center "
+        className="lg:w-[calc(100%-256px)] w-full flex bg-gray-500 opacitybottom-0 absolute bottom-0 px-4 items-center "
         style={{
           background:
             "linear-gradient(rgba(255,255,255,0), rgba(220, 220, 220,1))",
         }}
       >
         <div className="flex-grow px-4 py-3">
+          <div onClick={handleRefresh}>clear</div>
           <textarea
             rows="1"
             className="w-full border p-4 rounded-xl focus:border-blue-400 focus:outline-none "
@@ -209,12 +218,8 @@ function ChatController({
           </button>
           
         </div>
-        <div className="relative bottom-20 right-10 text-xl">
-         hi
-         <ScrollButton/>
-        </div>
       </div>
-      <div className="pb-1"></div>
+      <div ref={messagesEndRef} />
     </div>
   );
 }

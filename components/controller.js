@@ -102,28 +102,20 @@ function Controller() {
   };
 
   const handleRefresh = async () => {
-    await fetch("http://54.193.180.218:8000/clear_chat_history", {
-      method: "GET",
+    const response = await axios.get("/api/chatbot/getClearChatHistory", {
       headers: {
+        
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     })
-      .then(async (res) => {
-        if (res.ok) {
-          setMessages([]);
-          window.alert("refreshed");
-        } else if (res.status === 401) {
-          window.alert("please login first");
-        } else {
-          const mes = await res.json();
-          console.log(mes);
-          window.alert(mes.detail);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+    if(response.status ===200){
+      alert("Successfully clear history")
+      setMessages([]);
+    } else{
+      alert("failed to clear history")
+    }
   };
 
   return (
@@ -137,6 +129,7 @@ function Controller() {
         handleClick={handleClick}
         handleRefresh={handleRefresh}
       />
+      
     </div>
   );
 }
