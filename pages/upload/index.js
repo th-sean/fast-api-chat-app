@@ -179,7 +179,7 @@ function UploadPage() {
       }
     );
     console.log("this is response ", response.data);
-    
+
     if (response.status === 200) {
       console.log("Deleted document");
       setDeleteStatus("complete");
