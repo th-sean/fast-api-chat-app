@@ -15,7 +15,7 @@ function UploadPage() {
   const [fileUpload, setFileUpload] = useState(null);
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileIdToDelete, setFileIdToDelete] = useState(null);
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
@@ -119,8 +119,8 @@ function UploadPage() {
     } else {
       setUploadStatus("failed");
       console.log("fetching document");
-      fetchUploadedDocuments();
       setUploadProgress(-1);
+      fetchUploadedDocuments();
     }
   }
 
@@ -187,12 +187,13 @@ function UploadPage() {
       } else {
         console.log("it is not 200")
         setDeleteStatus("complete");
-        setDeleteConfirmOpen(false);
+        
+        fetchUploadedDocuments();
       }
     } catch (error) {
       console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
-      setDeleteConfirmOpen(false);
+      fetchUploadedDocuments();
       alert('Failed to Delete File.');
     }
   }
@@ -324,7 +325,7 @@ function UploadPage() {
                         Delete
                         <Modal
                           className="modal"
-                          isOpen={isDeleteModalOpen}
+                          isOpen={isDeleteConfirmOpen}
                           // onRequestClose={() => setDeleteConfirmOpen(false)}
                           overlayClassName="modal-overlay"
                         >
