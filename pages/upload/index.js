@@ -16,7 +16,7 @@ function UploadPage() {
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [fileIdToDelete, setFileIdToDelete] = useState(null);
+  const [selectedID, setSelectedID] = useState(null);
   const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
   const [PromptModalTitle, setPromptModalTitle] = useState("");
   const [PromptModalBody, setPromptModalBody] = useState("");
@@ -33,8 +33,7 @@ function UploadPage() {
   const router = useRouter();
 
   const openDeleteModal = (item, fileId) => {
-    setFileIdToDelete(fileId);
-    setFileInfoToDelete(item);
+    
     setDeleteConfirmOpen(true);
   };
 
@@ -85,8 +84,11 @@ function UploadPage() {
     setShowUploadDropdown(!showUploadDropdown);
   };
 
-  const toggleKebabDropdown = (event, index) => {
+  const toggleKebabDropdown = (event, index, docId) => {
     event.stopPropagation();
+    if (showKebabDropdown !== index) {
+      setSelectedID(docId);  // Set the selectedID here
+    }
     setShowKebabDropdown(index === showKebabDropdown ? null : index);
   };
 
@@ -142,12 +144,13 @@ function UploadPage() {
   }
 
   async function getDownloadDocument() {
-    const selectedId = fileIdToDelete;
-    console.log("this is download document id" + selectedId);
+    if (!selectedID) return;
+    
+    console.log("this is download document id" + selectedID);
 
     const response = await axios.post(
       `/api/upload/postFileDownload`,
-      { selectedId: selectedId },
+      { selectedId: selectedID },
       {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -159,17 +162,19 @@ function UploadPage() {
 
     if (response.status === 200) {
     } else {
+      
     }
   }
 
   async function deleteDocument() {
-    const selectedId = fileIdToDelete;
+
+    if (!selectedID) return;
     setDeleteStatus("in-progress");
-    console.log("this is delete document id" + selectedId);
+    console.log("this is delete document id" + selectedID);
     try {
       const response = await axios.post(
         `/api/upload/getDeleteDocument`,
-        { selectedId: selectedId },
+        { selectedId: selectedID },
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -296,7 +301,7 @@ function UploadPage() {
                 <div className="overflow-hidden truncate">{item.file_name}</div>
                 <div
                   className="ml-auto hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
-                  onClick={(e) => toggleKebabDropdown(e, index)}
+                  onClick={(e) => toggleKebabDropdown(e, index, item.id)}
                 >
                   <CiMenuKebab className="text-gray-600 text-xl" />
                 </div>
