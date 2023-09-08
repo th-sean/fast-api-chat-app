@@ -15,7 +15,6 @@ export default async function handler(req, res) {
       }
     );
     // Set the appropriate headers dynamically based on the received content type
-    // Set the appropriate headers dynamically based on the received content type
     res.setHeader("Content-Type", response.headers["content-type"]);
     res.setHeader(
       "Content-Disposition",
