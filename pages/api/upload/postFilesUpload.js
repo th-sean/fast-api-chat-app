@@ -9,7 +9,7 @@ export const config = {
 
 async function handler(req, res) {
   console.log("Request headers:", req.headers);
-  console.log("Request body:", req.body);
+  console.log("Request body:", req);
   const token = req.headers.authorization.split(' ')[1]; // Extracting token for authorization
     
 
@@ -24,7 +24,7 @@ async function handler(req, res) {
     };
 
     try {
-      const { data } = await axios.post('http://54.193.180.218:8000/uploadfiles', req.body, axiosConfig);
+      const { data } = await axios.post('http://54.193.180.218:8000/uploadfiles', req, axiosConfig);
       data.pipe(res);  
       res.status(200).json({
         success: true,

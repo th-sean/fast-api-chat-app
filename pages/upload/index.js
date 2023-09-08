@@ -12,7 +12,7 @@ import Spinner from "../../components/animation/spinner";
 // import "react-quill/dist/quill.snow.css";
 
 function UploadPage() {
-  const [fileUpload, setFileUpload] = useState(null);
+  const [filesUpload, setFilesUpload] = useState([]);
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -64,11 +64,11 @@ function UploadPage() {
     fileInput.current.click();
   }
 
-  function handleFileChange(e) {
-    const fileUploaded = e.target.files;
-    if (!fileUploaded) return;
-    setFileUpload(fileUploaded);
-    handleFileUpload(fileUploaded);
+  function handleFileChange(event) {
+    setFilesUpload([...event.target.files])
+   console.log("this is files"+ filesUpload.name)
+    handleFilesUpload([...event.target.files])
+    // handleFilesUpload();
     setShowPopup(true);
     setShowUploadDropdown(null);
   }
@@ -87,6 +87,7 @@ function UploadPage() {
     event.stopPropagation();
     if (showKebabDropdown !== index) {
       setSelectedID(docId); // Set the selectedID here
+      console.log("ID Selected :" + docId);
     }
     setShowKebabDropdown(index === showKebabDropdown ? null : index);
   };
@@ -95,6 +96,36 @@ function UploadPage() {
     setShowKebabDropdown(null);
     setShowUploadDropdown(false);
   };
+
+  async function handleFilesUpload(files) {
+    setUploadStatus("in-progress");
+    console.log("handleFilesUpload " + filesUpload)
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+  });
+    
+    const response = await axios.post("/api/upload/postFilesUpload", formData, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+      onUploadProgress: (progressEvent) => {
+        setUploadProgress(progressEvent);
+        console.log(progressEvent)
+      },
+    });
+
+    if (response.status === 200) {
+      setUploadStatus("completed");
+      console.log("upload completed");
+      fetchUploadedDocuments();
+    } else {
+      setUploadStatus("failed");
+      console.log("fetching document");
+      setUploadProgress(-1);
+      fetchUploadedDocuments();
+    }
+  }
 
   async function handleFileUpload(file) {
     if (!file) return;
@@ -173,7 +204,6 @@ function UploadPage() {
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
-   
   }
 
   async function deleteDocument() {
@@ -201,13 +231,14 @@ function UploadPage() {
       } else {
         console.log("it is not 200");
         setDeleteStatus("complete");
-
         fetchUploadedDocuments();
+        setDeleteConfirmOpen(false);
       }
     } catch (error) {
       console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
       fetchUploadedDocuments();
+      setDeleteConfirmOpen(false);
       alert("Failed to Delete File.");
     }
   }
@@ -250,6 +281,7 @@ function UploadPage() {
                       ref={fileInput}
                       onChange={handleFileChange}
                       style={{ display: "none" }}
+                      multiple
                     ></input>
                   </li>
                   <li
@@ -305,9 +337,24 @@ function UploadPage() {
             documentList.map((item, index) => (
               <div
                 key={index}
-                className="relative flex border items-center font-medium p-3 rounded-lg hover:shadow-lg hover:bg-gray-200 transition duration-300 m-2"
+                className="relative flex border items-center font-medium p-3 rounded-lg  hover:bg-gray-100 transition duration-300 m-2"
               >
-                <div className="overflow-hidden truncate">{item.file_name}</div>
+                <div className="flex items-center justify-center">
+                  <div className="">
+                    {deleteStatus === "in-progress" &&
+                      selectedID === item.id && (
+                        <Spinner
+                          className="mr-5"
+                          size={`w-5 h-5`}
+                          tintColor={"fill-red-600"}
+                          bgColor={"dark:text-gray-200"}
+                        />
+                      )}
+                  </div>
+                  <div className="overflow-hidden truncate ml-4">
+                    {item.file_name}
+                  </div>
+                </div>
                 <div
                   className="ml-auto hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
                   onClick={(e) => toggleKebabDropdown(e, index, item.id)}
@@ -340,7 +387,7 @@ function UploadPage() {
                         <Modal
                           className="modal"
                           isOpen={isDeleteConfirmOpen}
-                          // onRequestClose={() => setDeleteConfirmOpen(false)}
+                          onRequestClose={() => setDeleteConfirmOpen(false)}
                           overlayClassName="modal-overlay"
                         >
                           <h2 className="text-lg font-bold">
@@ -352,7 +399,10 @@ function UploadPage() {
                           </p>
                           <div className="flex justify-end mt-5">
                             <button
-                              onClick={() => setDeleteConfirmOpen(false)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirmOpen(false);
+                              }}
                               className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
                             >
                               Cancel
@@ -365,7 +415,12 @@ function UploadPage() {
                                 "Completed"
                               ) : deleteStatus === "in-progress" ? (
                                 <div className="flex items-center justify-center">
-                                  <Spinner className="" size={`w-5 h-5`} />{" "}
+                                  <Spinner
+                                    className=""
+                                    size={`w-5 h-5`}
+                                    tintColor={"fill-white"}
+                                    bgColor={"dark:text-red-500"}
+                                  />{" "}
                                   <div className="ml-1">Deleting</div>{" "}
                                 </div>
                               ) : (
@@ -406,7 +461,7 @@ function UploadPage() {
           </div>
           <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-xs overflow-hidden truncate">
-              {fileUpload ? <div> {fileUpload[0].name}</div> : <div>Null</div>}{" "}
+              {filesUpload ? <div> {filesUpload[0].name}</div> : <div>Null</div>}{" "}
             </h2>
             <p className="font-bold text-xs">
               {(uploadProgress.progress * 100).toFixed(0)}%
