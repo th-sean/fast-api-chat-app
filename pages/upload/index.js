@@ -12,7 +12,7 @@ import Spinner from "../../components/animation/spinner";
 // import "react-quill/dist/quill.snow.css";
 
 function UploadPage() {
-  const [fileUpload, setFileUpload] = useState(null);
+  const [filesUpload, setFilesUpload] = useState([]);
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -64,11 +64,11 @@ function UploadPage() {
     fileInput.current.click();
   }
 
-  function handleFileChange(e) {
-    const fileUploaded = e.target.files;
-    if (!fileUploaded) return;
-    setFileUpload(fileUploaded);
-    handleFileUpload(fileUploaded);
+  function handleFileChange(event) {
+    setFilesUpload([...event.target.files])
+   console.log("this is files"+ filesUpload.name)
+    handleFilesUpload([...event.target.files])
+    // handleFilesUpload();
     setShowPopup(true);
     setShowUploadDropdown(null);
   }
@@ -96,6 +96,36 @@ function UploadPage() {
     setShowKebabDropdown(null);
     setShowUploadDropdown(false);
   };
+
+  async function handleFilesUpload(files) {
+    setUploadStatus("in-progress");
+    console.log("handleFilesUpload " + filesUpload)
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+  });
+    
+    const response = await axios.post("/api/upload/postFilesUpload", formData, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+      onUploadProgress: (progressEvent) => {
+        setUploadProgress(progressEvent);
+        console.log(progressEvent)
+      },
+    });
+
+    if (response.status === 200) {
+      setUploadStatus("completed");
+      console.log("upload completed");
+      fetchUploadedDocuments();
+    } else {
+      setUploadStatus("failed");
+      console.log("fetching document");
+      setUploadProgress(-1);
+      fetchUploadedDocuments();
+    }
+  }
 
   async function handleFileUpload(file) {
     if (!file) return;
@@ -251,6 +281,7 @@ function UploadPage() {
                       ref={fileInput}
                       onChange={handleFileChange}
                       style={{ display: "none" }}
+                      multiple
                     ></input>
                   </li>
                   <li
@@ -430,7 +461,7 @@ function UploadPage() {
           </div>
           <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-xs overflow-hidden truncate">
-              {fileUpload ? <div> {fileUpload[0].name}</div> : <div>Null</div>}{" "}
+              {filesUpload ? <div> {filesUpload[0].name}</div> : <div>Null</div>}{" "}
             </h2>
             <p className="font-bold text-xs">
               {(uploadProgress.progress * 100).toFixed(0)}%
