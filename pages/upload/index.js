@@ -33,7 +33,6 @@ function UploadPage() {
   const router = useRouter();
 
   const openDeleteModal = (item, fileId) => {
-    
     setDeleteConfirmOpen(true);
   };
 
@@ -87,7 +86,7 @@ function UploadPage() {
   const toggleKebabDropdown = (event, index, docId) => {
     event.stopPropagation();
     if (showKebabDropdown !== index) {
-      setSelectedID(docId);  // Set the selectedID here
+      setSelectedID(docId); // Set the selectedID here
     }
     setShowKebabDropdown(index === showKebabDropdown ? null : index);
   };
@@ -145,29 +144,39 @@ function UploadPage() {
 
   async function getDownloadDocument() {
     if (!selectedID) return;
-    
+
     console.log("this is download document id" + selectedID);
+    try {
+      const response = await axios.post(
+        `/api/upload/getDownloadDocument`,
+        { selectedId: selectedID },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          responseType: "arraybuffer", // Ensure the response type is arraybuffer
+        }
+      );
+      // Convert the arraybuffer to a blob with the appropriate content type
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const blobURL = URL.createObjectURL(blob);
 
-    const response = await axios.post(
-      `/api/upload/postFileDownload`,
-      { selectedId: selectedID },
-      {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
+      // Open the blob URL in a new tab
+      window.open(blobURL, "_blank");
+
+      if (response.status === 200) {
+        console.log("Document Opened");
       }
-    );
-    console.log("this is response ", response.data);
-
-    if (response.status === 200) {
-    } else {
-      
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
+   
   }
 
   async function deleteDocument() {
-
     if (!selectedID) return;
     setDeleteStatus("in-progress");
     console.log("this is delete document id" + selectedID);
@@ -190,16 +199,16 @@ function UploadPage() {
         fetchUploadedDocuments();
         setDeleteConfirmOpen(false);
       } else {
-        console.log("it is not 200")
+        console.log("it is not 200");
         setDeleteStatus("complete");
-        
+
         fetchUploadedDocuments();
       }
     } catch (error) {
       console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
       fetchUploadedDocuments();
-      alert('Failed to Delete File.');
+      alert("Failed to Delete File.");
     }
   }
 
