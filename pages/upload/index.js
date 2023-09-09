@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { BsUpload, BsFilter } from "react-icons/bs";
 import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
+import { HiOutlineDocumentText } from "react-icons/hi";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
@@ -65,9 +66,9 @@ function UploadPage() {
   }
 
   function handleFileChange(event) {
-    setFilesUpload([...event.target.files])
-   console.log("this is files"+ filesUpload.name)
-    handleFilesUpload([...event.target.files])
+    setFilesUpload([...event.target.files]);
+    console.log("this is files" + filesUpload.name);
+    handleFilesUpload([...event.target.files]);
     // handleFilesUpload();
     setShowPopup(true);
     setShowUploadDropdown(null);
@@ -99,19 +100,19 @@ function UploadPage() {
 
   async function handleFilesUpload(files) {
     setUploadStatus("in-progress");
-    console.log("handleFilesUpload " + filesUpload)
+    console.log("handleFilesUpload " + filesUpload);
     const formData = new FormData();
     files.forEach((file) => {
-      formData.append('files', file);
-  });
-    
+      formData.append("files", file);
+    });
+
     const response = await axios.post("/api/upload/postFilesUpload", formData, {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
       },
       onUploadProgress: (progressEvent) => {
         setUploadProgress(progressEvent);
-        console.log(progressEvent)
+        console.log(progressEvent);
       },
     });
 
@@ -332,7 +333,7 @@ function UploadPage() {
           <div className="text-lg font-bold p-2 ">
             {documentList.length} Files Found
           </div>
-          <div></div>
+
           {documentList &&
             documentList.map((item, index) => (
               <div
@@ -342,16 +343,21 @@ function UploadPage() {
                 <div className="flex items-center justify-center">
                   <div className="">
                     {deleteStatus === "in-progress" &&
-                      selectedID === item.id && (
-                        <Spinner
-                          className="mr-5"
-                          size={`w-5 h-5`}
-                          tintColor={"fill-red-600"}
-                          bgColor={"dark:text-gray-200"}
-                        />
-                      )}
+                    selectedID === item.id ? (
+                      <Spinner
+                        className="mr-5"
+                        size={`w-5 h-5`}
+                        tintColor={"fill-red-600"}
+                        bgColor={"dark:text-gray-200"}
+                      />
+                    ) : (
+                      <div className="text-xl">
+                        <HiOutlineDocumentText />
+                      </div>
+                    )}
                   </div>
-                  <div className="overflow-hidden truncate ml-4">
+
+                  <div className=" ml-4 truncate">
                     {item.file_name}
                   </div>
                 </div>
@@ -364,7 +370,7 @@ function UploadPage() {
                 {showKebabDropdown === index && (
                   <div
                     ref={dropdownKebabRef}
-                    className="absolute top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
+                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
                   >
                     <ul>
                       <li
@@ -461,7 +467,11 @@ function UploadPage() {
           </div>
           <div className="flex justify-between items-center mb-4 ">
             <h2 className="text-xs overflow-hidden truncate">
-              {filesUpload ? <div> {filesUpload[0].name}</div> : <div>Null</div>}{" "}
+              {filesUpload ? (
+                <div> {filesUpload[0].name}</div>
+              ) : (
+                <div>Null</div>
+              )}{" "}
             </h2>
             <p className="font-bold text-xs">
               {(uploadProgress.progress * 100).toFixed(0)}%
