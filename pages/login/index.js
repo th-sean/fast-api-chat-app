@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
+import useLabelArrayStore from "../../stores/store";
 
 export default function LoginPage() {
   const [message, setMessage] = useState("");
@@ -23,8 +24,10 @@ export default function LoginPage() {
         "successfully retrive the access token to login.js" +
           response.data
       );
-      // setMessage(response.data.message);
+      setMessage(response.data.message);
       sessionStorage.setItem("accessToken", response.data.accessToken);
+      console.log("getprofile here")
+      
       window.location.href = "/upload";
     } catch (error) {
       // setMessage(error.response.data.message);

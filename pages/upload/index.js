@@ -8,6 +8,7 @@ import { HiOutlineDocumentText } from "react-icons/hi";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
+import useChatInfoStore from "../../stores/chatStore";
 
 // import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
@@ -31,8 +32,8 @@ function UploadPage() {
   const [showKebabDropdown, setShowKebabDropdown] = useState(false);
   const dropdownUploadRef = useRef(false);
   const dropdownKebabRef = useRef(false);
-  const router = useRouter();
-
+  const setSummarizeId = useChatInfoStore((state) => state.setSummarizeId);
+  const router = useRouter()
   const openDeleteModal = (item, fileId) => {
     setDeleteConfirmOpen(true);
   };
@@ -245,8 +246,8 @@ function UploadPage() {
   }
 
   function redirectToChatbot(file_id) {
-    const documentId = file_id; // Replace with how you retrieve the ID
-    router.push(`/chatbot?docId=${documentId}`);
+    setSummarizeId(file_id)
+    router.push('/chatbot')
   }
 
   return (
