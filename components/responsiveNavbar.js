@@ -11,6 +11,8 @@ import { BsChat } from "react-icons/bs";
 import Image from "next/image";
 import useAccountInfoStore from "../stores/store.js";
 import axios from "axios";
+import { useRouter } from 'next/router';
+
 
 async function getProfile(setLabelArray, setUsername) {
   const response = await axios.get("/api/getProfile", {
@@ -92,12 +94,18 @@ const Navbar = () => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [token, setToken] = useState("");
   const username = useAccountInfoStore((state) => state.username);
+  const router = useRouter(); // Get the router object
+  // ... other useState and variables ...
 
+ 
   useEffect(() => {
     setToken(sessionStorage.getItem("accessToken"));
-
-    // Other useEffect code...
-  }, [token]);
+    const currentTabIndex = tabs.findIndex(tab => tab.link === router.pathname);
+    if (currentTabIndex !== -1) {
+        setSelectedTabIndex(currentTabIndex);
+    }
+   
+  }, [token, router.pathname]);
 
   return (
     <div>
@@ -125,7 +133,6 @@ const Navbar = () => {
                 <AiOutlineUser className="text-4xl fill-current bg-blue-400 rounded p-1 fill-white" />
               </div>
               <div className="text-sm">{username}</div>
-              
             </div>
             <Link href={"/login"} className="text-sm">
               <AiOutlineLogin className="text-xl" />

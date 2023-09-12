@@ -80,13 +80,6 @@ function ChatController({
               ))}
             </div>
           </div>
-        ) : isLoading && messages.length == 0 ? (
-          // This is where you can add the content for the new condition (isLoading && messages.length == 0)
-
-          <div className="flex mt-20 w-full items-center justify-center">
-            <Loading className="" />
-            <div className="">Generating answers for you…</div>
-          </div>
         ) : (
           <div className="flex flex-col justify-between h-full">
             <div className="p-6"></div>
