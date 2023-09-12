@@ -1,5 +1,5 @@
 import "../styles/globals.css";
-import Navbar from "../components/responsiveNabbar"; // Import the merged Navbar
+import Navbar from "../components/responsiveNavbar"; // Import the merged Navbar
 import { useRouter } from 'next/router';
 
 function MyApp({ Component, pageProps }) {
