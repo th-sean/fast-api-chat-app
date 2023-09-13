@@ -112,7 +112,7 @@ const Navbar = () => {
       <div className="hidden lg:block relative h-screen overflow-y-hidden w-64 bg-white shadow-md z-10 transition-transform transform translate-x-0 transition duration-300 flex flex-col">
         <div className="w-full h-40">
           <img
-            src="/assets/logo.png"
+            src="/logo.png"
             alt="My Image"
             width={300}
             height={200}
