@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AuthNotFound from "../../components/authNotfound";
 
+
 function ProfilePage() {
   const [message, setMessage] = useState("Show Info");
   const [token, setToken] = useState("");
@@ -9,7 +10,9 @@ function ProfilePage() {
 
   useEffect(() => {
     setToken(sessionStorage.getItem("accessToken"));
+    
   }, [token]);
+
 
   async function getProfile() {
     const response = await axios.get("/api/getProfile", {
@@ -18,9 +21,13 @@ function ProfilePage() {
       },
     });
     setUserInfo(response.data);
+
     if (response.data.success) {
       setMessage(response.data.message);
       setUserInfo(response.data.response);
+
+   
+    
     } else {
       setMessage(response.data.message);
     }

@@ -19,6 +19,7 @@ const HamburgerNavbar = () => {
   const [drawerOpen, setdrawerOpen] = useState(false);
   const [token, setToken] = useState("");
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  
 
   const tabs = [
     {
@@ -55,7 +56,7 @@ const HamburgerNavbar = () => {
   }, [token]);
 
   return (
-    <div className="bg-slate-100 p-4 relative lg:hidden">
+    <div className="bg-slate-100 items-center justify-center p-4 relative lg:hidden">
       {drawerOpen && (
         <div
           className="fixed top-0 left-0 h-full w-full bg-black bg-opacity-50 z-20 "
@@ -106,7 +107,7 @@ const HamburgerNavbar = () => {
       </div>
 
       {/* Right side */}
-      <div className="float-right relative">{/* Profile Icon */}</div>
+      <Link className="float-right relative text-2xl" href="/profile"><AiOutlineUser/></Link>
 
       {/* Clear float */}
       <div className="clear-both"></div>

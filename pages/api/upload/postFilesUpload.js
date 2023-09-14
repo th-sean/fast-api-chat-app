@@ -8,15 +8,18 @@ export const config = {
 };
 
 async function handler(req, res) {
+  console.log("Request headers:", req.headers);
+  console.log("Request body:", req);
   const token = req.headers.authorization.split(' ')[1]; // Extracting token for authorization
-    console.log("this is reqbody check " + JSON.stringify(req))
+    
 
   if (req.method === "POST") {
     const axiosConfig = {
       responseType: "stream",
       headers: {
         "accept": "application/json",
-        "Authorization": `Bearer ${token}`  // Set the authorization header
+        "Authorization": `Bearer ${token}`,  // Set the authorization header
+        "Content-Type": req.headers["content-type"]
       },
     };
 
