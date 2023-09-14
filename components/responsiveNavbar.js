@@ -55,11 +55,12 @@ const tabs = [
   },
 ];
 
-const TabItems = ({ setSelectedTabIndex, selectedTabIndex }) => {
+const TabItems = ({ setSelectedTabIndex, selectedTabIndex, setShowCreateModal }) => {
+  
   return (
     <div>
       <div className="flex justify-center align-middle px-5 pt-4 pb-3">
-        <button className="transition-all duration-200 relative font-semibold shadow-sm outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm bg-blue-600 text-white ring-0 ring-blue-600 hover:ring-2 active:ring-0 w-full">
+        <button className="transition-all duration-200 relative font-semibold shadow-sm outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm bg-blue-600 text-white ring-0 ring-blue-600 hover:ring-2 active:ring-0 w-full" onClick={setShowCreateModal(true)}>
           + Create content
         </button>
       </div>
@@ -80,6 +81,27 @@ const TabItems = ({ setSelectedTabIndex, selectedTabIndex }) => {
         </div>
       ))}
     </div>
+  );
+};
+
+const CreateContentModal = ({ showModal, setShowModal }) => {
+  return (
+    showModal && (
+      <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+        <div className="bg-white rounded p-8">
+          <h1 className="mb-2 text-lg font-semibold text-gray-900">My Modal</h1>
+          <p className="text-sm font-normal text-gray-600">This is the content of the modal.</p>
+          <div className="flex justify-end p-6"></div>
+          <button
+            className="transition-all duration-200 relative font-medium shadow-sm outline-none hover:outline-none focus:outline-none rounded-lg px-4 py-2 text-base bg-white text-gray-600 ring-1 ring-gray-200 hover:ring-2 active:ring-1"
+            onClick={() => setShowModal(false)}
+          >
+            <span className="flex items-center justify-center mx-auto space-x-2 select-none">Close Modal</span>
+            
+          </button>
+        </div>
+      </div>
+    )
   );
 };
 
@@ -112,7 +134,7 @@ const Navbar = () => {
   const [token, setToken] = useState("");
   const username = useAccountInfoStore((state) => state.username);
   const router = useRouter(); // Get the router object
-  // ... other useState and variables ...
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     setToken(sessionStorage.getItem("accessToken"));
@@ -142,11 +164,12 @@ const Navbar = () => {
           </Link>
         </div>
       </div>
-      <div className="hidden lg:block relative h-screen overflow-y-hidden w-64 bg-white z-10 transition-transform transform translate-x-0 transition duration-300 flex flex-col">
+      <div className="hidden lg:block relative h-screen overflow-y-hidden w-64 bg-white transition-transform transform translate-x-0 transition duration-300 flex flex-col">
         <div className="pb-2 flex-0 border-b border-gray-200 mt-2 ">
           <TabItems
             setSelectedTabIndex={setSelectedTabIndex}
             selectedTabIndex={selectedTabIndex}
+            setShowCreateModal={setShowCreateModal}
           />
         </div>
         <InterestItems />
@@ -191,6 +214,11 @@ const Navbar = () => {
 
         <div className="clear-both"></div>
       </div>
+      <CreateContentModal
+        showModal={showCreateModal}
+        setShowCreateModal={setShowCreateModal}
+        
+      />
     </div>
   );
 };
