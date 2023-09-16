@@ -339,7 +339,7 @@ function UploadPage() {
             documentList.map((item, index) => (
               <div
                 key={index}
-                className="relative flex border items-center font-medium p-3 rounded-lg  hover:bg-gray-100 transition duration-300 m-2"
+                className="relative flex border items-center font-medium p-3 rounded-lg  transition duration-300 m-2"
               >
                 <div className="flex items-center justify-center">
                   <div className="">
@@ -363,7 +363,7 @@ function UploadPage() {
                   </div>
                 </div>
                 <div
-                  className="ml-auto hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
+                  className="ml-auto p-2 rounded-lg cursor-pointer"
                   onClick={(e) => toggleKebabDropdown(e, index, item.id)}
                 >
                   <CiMenuKebab className="text-gray-600 text-xl" />
@@ -371,7 +371,7 @@ function UploadPage() {
                 {showKebabDropdown === index && (
                   <div
                     ref={dropdownKebabRef}
-                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg "
+                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-2 bg-white "
                   >
                     <ul>
                       <li
