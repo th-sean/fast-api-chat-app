@@ -42,12 +42,12 @@ async function getProfile(setLabelArray, setUsername) {
 const tabs = [
   {
     icon: <PiUploadDuotone className="w-4 h-4" />,
-    text: "Knowledge base",
+    text: "Manage Document",
     link: "/upload",
   },
   {
     icon: <PiChatTeardropTextDuotone className="w-4 h-4" />,
-    text: "Chatbot",
+    text: "Conversation",
     link: "/chatbot",
   },
   {
@@ -218,7 +218,9 @@ const Navbar = () => {
               className="transition-all duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-600 hover:ring-2 active:ring-0 w-full"
               onClick={() => {}}
             >
-              New conversation
+              <Link href={"/chatbot"}>
+            New Conversation
+          </Link>
             </button>
           </div>
         </div>

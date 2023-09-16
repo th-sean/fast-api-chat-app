@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Loading from "./animation/loading";
 import ScrollButton from "./scrollBottom";
+import { FaPaperPlane, FaTrashCan, FaRegComments } from "react-icons/fa6";
+import { icons } from "react-icons";
 
 function ChatController({
   inputText,
@@ -64,9 +66,10 @@ function ChatController({
         {console.log(messages)}
         {messages.length == 0 && !docId ? (
           <div className="h-screen mb-0">
-            <div className="font-bold text-7xl text-[#cccfef8c] text-center pt-10">
-              Chatbot-Demo
+            <div className="flex justify-center items-center font-bold text-8xl pt-10 text-[#cccfef8c]">
+              <FaRegComments />
             </div>
+
             <div className="grid grid-cols-2 gap-4 align-center mt-20 justify-center  p-10">
               {Instruction.map((item, index) => (
                 <div
@@ -119,7 +122,7 @@ function ChatController({
                   </>
                 ) : item.sender == "bot-loading" && isLoading ? (
                   <>
-                    <div className=" bg-gray-100 px-20 py-5  flex " key={key}>
+                    <div className=" bg-gray-50 px-20 py-5  flex " key={key}>
                       <div className="text-white">
                         <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
                       </div>
@@ -139,7 +142,7 @@ function ChatController({
                   </>
                 ) : (
                   <>
-                    <div className="bg-gray-100 px-20 py-5 flex" key={key}>
+                    <div className="bg-gray-50 px-20 py-5 flex" key={key}>
                       <div className="text-white">
                         <AiOutlineRobot className="text-4xl fill-current bg-indigo-600 rounded p-1" />
                       </div>
@@ -181,15 +184,13 @@ function ChatController({
             "linear-gradient(rgba(255,255,255,0), rgba(220, 220, 220,1))",
         }}
       >
-        <div className="flex flex-col w-full @sm:pb-5 max-w-7xl m-auto rounded-sm bg-gray-500">
-         
-
+        <div className="mx-4 mb-5 flex flex-col w-full @sm:pb-5 max-w-7xl m-auto border rounded-lg">
           {/* Textarea/Input Box */}
           <div className="">
             <textarea
-            rows="1"
-              style = {{"height": "45px", "overflow-y": "hidden"}}
-              className="block w-full text-gray-900 placeholder:text-gray-400 text-sm font-normal resize-none outline-none p-3 rounded-t-lg focus:outline-none border-none bg-white"
+              rows="4"
+              style={{ height: "45px", "overflow-y": "hidden" }}
+              className="block w-full text-gray-900 placeholder:text-gray-400 text-base font-normal resize-none outline-none px-4 py-4 rounded-t-lg focus:outline-none border-none bg-white"
               placeholder={
                 isLoading ? "Wait a second...." : "Type your message..."
               }
@@ -197,32 +198,40 @@ function ChatController({
               onChange={handleInputChange}
             />
           </div>
-          <div className="flex gap-2 justify-between p-2.5">
-          {/* Clear Button */}
-          <div
-            className="mx-1 flex-shrink-0 px-4 py-3 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] opacity-80 text-white rounded-3xl"
-            onClick={handleRefresh}
-          >
-            <BsTrash className="text-xl text-2xl mx-1" />
-          </div>
-          {/* Submit Button */}
-          <div className="flex-shrink-0 h-full px-4 py-3">
-            <button
-              className={
-                "py-2 px-4 rounded-3xl items-center justify-center hover:text-white" +
-                (isLoading
-                  ? " opacity-40 text-white "
-                  : " opacity-80 bg-gradient-to-r from-[#542ee6] to-[#2a8ce6] text-white")
-              }
-              onClick={handleClick}
-            >
-              {isLoading ? (
-                <Loading className="px-1" />
-              ) : (
-                <AiOutlineSend className="text-2xl" />
-              )}
-            </button>
-          </div>
+          <div className="flex gap-2 justify-between p-2.5 bg-white border-b rounded-b-lg">
+            {/* Clear Button */}
+
+            <div className="flex-shrink-0 h-full px-2 py-1">
+              <button
+                className="transition-all duration-200 relative font-semibold shadow-sm rounded-md px-3 py-1.5 text-sm bg-blue-600 text-white ring-blue-600 active:ring-0 ring-0 hover:ring-0 outline-none hover:outline-none focus:outline-none border-0 h-full opacity-75"
+                onClick={handleRefresh}
+              >
+                <FaTrashCan className="text-xl mx-1" />
+              </button>
+            </div>
+            {/* Submit Button */}
+            <div className="flex-shrink-0 h-full px-2 py-1 flex">
+              <div className="flex items-center gap-2 mr-2">
+                <span className="ml-auto text-xs text-gray-500 transition-[color] duration-150 ease-in-out">
+                  {inputText.length}/6000
+                </span>
+              </div>
+              <button
+                className={
+                  "transition-all duration-200 relative font-semibold shadow-sm rounded-md px-3 py-1.5 text-sm text-white ring-blue-600 active:ring-0 ring-0 hover:ring-0 outline-none hover:outline-none focus:outline-none border-0 h-full opacity-75" +
+                  (isLoading
+                    ? " opacity-40 text-white "
+                    : " bg-blue-600 text-white")
+                }
+                onClick={handleClick}
+              >
+                {isLoading ? (
+                  <Loading className="px-1 py-2" />
+                ) : (
+                  <FaPaperPlane className="text-xl" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
