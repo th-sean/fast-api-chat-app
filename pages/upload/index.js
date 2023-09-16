@@ -255,7 +255,7 @@ function UploadPage() {
       <div className="bg-white p-5 rounded-lg ">
         <div className="text-lg font-bold p-2">All fies </div>
         <div className="flex flex-wrap w-full items-center justify-between">
-          <div className="relative mb-2 md:mb-0 flex z-10">
+          <div className="relative mb-2 md:mb-0 flex">
             {/* Title Button */}
 
             <button
@@ -371,7 +371,7 @@ function UploadPage() {
                 {showKebabDropdown === index && (
                   <div
                     ref={dropdownKebabRef}
-                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
+                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg "
                   >
                     <ul>
                       <li
