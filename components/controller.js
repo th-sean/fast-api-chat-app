@@ -55,9 +55,10 @@ function Controller() {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
+        timeout: 180000
       });
 
-      popChatArray(); // Remove loading message
+      popChatArray(); 
 
       if (response.status === 200) {
         const botMessage = response.data;
@@ -69,15 +70,23 @@ function Controller() {
         window.alert(response.data.detail);
       }
     } catch (error) {
-      popChatArray(); // Remove loading message
-      const errorMessage = {
-        sender: "bot",
-        message: { message: error.message },
-        time: sendTime,
-      };
-      addChatArray(errorMessage);
+      if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
+          const timeoutMessage = {
+              sender: "bot",
+              message: { message: "The request took too long! Please try again later." },
+              time: sendTime,
+          };
+          addChatArray(timeoutMessage);
+      } else {
+          const errorMessage = {
+              sender: "bot",
+              message: { message: error.message },
+              time: sendTime,
+          };
+          addChatArray(errorMessage);
+      }
       console.error(error);
-    }
+  }
     setIsLoading(false);
   };
 
