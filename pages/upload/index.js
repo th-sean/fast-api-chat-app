@@ -9,11 +9,12 @@ import { CiMenuKebab } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
 import useChatInfoStore from "../../stores/chatStore";
+import withLayout from "../../components/layouts/withLayout";
 
 // import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
 
-function UploadPage() {
+function UploadPage({accessToken}) {
   const [filesUpload, setFilesUpload] = useState([]);
   const [documentList, setDocumentList] = useState([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
@@ -41,7 +42,11 @@ function UploadPage() {
   const [editorContent, setEditorContent] = useState("");
 
   useEffect(() => {
-    fetchUploadedDocuments();
+    console.log("here is from props: "+accessToken)
+    if (accessToken) {
+      fetchUploadedDocuments(accessToken);
+    }
+   
     const handleClickOutside = (event) => {
       const isOutsideUploadDropdown =
         showUploadDropdown &&
@@ -60,7 +65,7 @@ function UploadPage() {
     return () => {
       document.body.removeEventListener("click", handleClickOutside);
     };
-  }, []);
+  }, [accessToken]);
 
   async function handleFileChoose() {
     fileInput.current.click();
@@ -109,7 +114,7 @@ function UploadPage() {
 
     const response = await axios.post("/api/upload/postFilesUpload", formData, {
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       onUploadProgress: (progressEvent) => {
         setUploadProgress(progressEvent);
@@ -129,42 +134,43 @@ function UploadPage() {
     }
   }
 
-  async function handleFileUpload(file) {
-    if (!file) return;
+  // async function handleFileUpload(file) {
+  //   if (!file) return;
 
-    setUploadStatus("in-progress");
+  //   setUploadStatus("in-progress");
 
-    const formData = new FormData();
-    formData.append("file", file[0]);
-    console.log();
-    const response = await axios.post("/api/upload/postFileUpload", formData, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-      },
-      onUploadProgress: (progressEvent) => {
-        setUploadProgress(progressEvent);
-      },
-    });
+  //   const formData = new FormData();
+  //   formData.append("file", file[0]);
+  //   console.log();
+  //   const response = await axios.post("/api/upload/postFileUpload", formData, {
+  //     headers: {
+  //       Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+  //     },
+  //     onUploadProgress: (progressEvent) => {
+  //       setUploadProgress(progressEvent);
+  //     },
+  //   });
 
-    if (response.status === 200) {
-      setUploadStatus("completed");
-      console.log("upload completed");
-      fetchUploadedDocuments();
-    } else {
-      setUploadStatus("failed");
-      console.log("fetching document");
-      setUploadProgress(-1);
-      fetchUploadedDocuments();
-    }
-  }
+  //   if (response.status === 200) {
+  //     setUploadStatus("completed");
+  //     console.log("upload completed");
+  //     fetchUploadedDocuments();
+  //   } else {
+  //     setUploadStatus("failed");
+  //     console.log("fetching document");
+  //     setUploadProgress(-1);
+  //     fetchUploadedDocuments();
+  //   }
+  // }
 
   async function handlePromptSubmit() {}
 
-  async function fetchUploadedDocuments() {
+  async function fetchUploadedDocuments(token) {
     console.log("Get documentList");
+    console.log("this is accessToken from parameter" +token)
     const response = await axios.get("/api/upload/getDocumentsList", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
@@ -493,4 +499,4 @@ function UploadPage() {
   );
 }
 
-export default UploadPage;
+export default withLayout(UploadPage, 'dashboard');

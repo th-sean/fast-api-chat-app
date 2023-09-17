@@ -22,23 +22,6 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import firstLetterCapitalized from "../utils/stringManimupaltion.js";
 
-async function getProfile(setLabelArray, setUsername) {
-  const response = await axios.get("/api/getProfile", {
-    headers: {
-      Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-    },
-  });
-
-  if (response.data.success) {
-    const array = response.data.response.file_labels.split(", ");
-    setLabelArray(array);
-    const username = response.data.response.username;
-    setUsername(username);
-  } else {
-    setMessage(response.data.message); // Note: Make sure 'setMessage' is properly defined and accessible
-  }
-}
-
 const tabs = [
   {
     icon: <PiUploadDuotone className="w-4 h-4" />,
@@ -140,47 +123,30 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
     )
   );
 };
-
-function InterestItems() {
-  const labelArray = useAccountInfoStore((state) => state.labelArray);
-  const setLabelArray = useAccountInfoStore((state) => state.setLabelArray); // Get the setter function
-  const setUsername = useAccountInfoStore((state) => state.setUsername);
-
-  useEffect(() => {
-    getProfile(setLabelArray, setUsername); // Pass setLabelArray to getProfile
-  }, []);
-
-  return (
-    <div className="p-2 flex flex-wrap">
-      {/* {labelArray.map((label, index) => (
-        <div
-          className="bg-blue-500 rounded text-white text-xs p-1 m-1"
-          key={index}
-        >
-          # {label}
-        </div>
-      ))} */}
-    </div>
-  );
+const handleLogout = () => {
+  sessionStorage.setItem("accessToken", "");
+ 
 }
 
-const Navbar = () => {
+function Navbar({accessToken}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [token, setToken] = useState("");
-  const username = useAccountInfoStore((state) => state.username);
+  const [username, setUsername] = useState("")
   const router = useRouter(); // Get the router object
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const loadedUsername = useAccountInfoStore((state) => state.username) || "";
+  
   useEffect(() => {
-    setToken(sessionStorage.getItem("accessToken"));
+    setToken(accessToken);
+    setUsername(loadedUsername)
     const currentTabIndex = tabs.findIndex(
       (tab) => tab.link === router.pathname
     );
     if (currentTabIndex !== -1) {
       setSelectedTabIndex(currentTabIndex);
     }
-  }, [token, router.pathname]);
+  }, [token, router.pathname], loadedUsername);
 
   return (
     <div className="">
@@ -197,7 +163,7 @@ const Navbar = () => {
                 {username}
               </div>
             </div>
-            <Link href={"/login"} className="text-sm">
+            <Link href={"/login"} className="text-sm" onClick={handleLogout}>
               <AiOutlineLogin className="text-xl" />
             </Link>
           </div>
@@ -209,7 +175,7 @@ const Navbar = () => {
             setShowCreateModal={setShowCreateModal}
           />
         </div>
-        <InterestItems />
+      
 
         <div className="flex-grow overflow-y-auto">
           <div className="text-sm text-gray-600 pl-5 pt-2">Chat</div>
