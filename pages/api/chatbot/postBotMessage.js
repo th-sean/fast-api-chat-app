@@ -17,6 +17,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       }
+      ,timeout: 180000
     });
     console.log("this is message" + response.data)
     if (response.status === 200) {
