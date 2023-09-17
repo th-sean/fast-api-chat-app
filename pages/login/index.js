@@ -7,6 +7,7 @@ import withLayout from "../../components/layouts/withLayout";
 
 function LoginPage() {
   const [message, setMessage] = useState("");
+  const setUsername = useAccountInfoStore((state) => state.setUsername);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +40,6 @@ function LoginPage() {
   };
 
   async function getProfile() {
-    const setUsername = useAccountInfoStore((state) => state.setUsername);
     const response = await axios.get("/api/getProfile", {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
