@@ -23,7 +23,7 @@ function withLayout(WrappedComponent, layoutType) {
                     <WrappedComponent {...props} />
                 </LoginLayout>
             );
-        }
+        } 
 
         return <WrappedComponent {...props} />;
     };

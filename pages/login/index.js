@@ -113,4 +113,4 @@ function LoginPage() {
     </div>
   );
 }
-export default withLayout(LoginPage)
+export default withLayout(LoginPage, "login")
