@@ -1,19 +1,9 @@
-function SinglePageLayout(WrappedComponent) {
-    function LayoutComponent(props) {
+export default function SinglePageLayout(Component) {
+    return function (props) {
         return (
             <div>
-                <WrappedComponent {...props} />
+                <Component {...props} />
             </div>
         );
-    }
-
-    LayoutComponent.displayName = `SinglePageLayout(${getDisplayName(WrappedComponent)})`;
-
-    return LayoutComponent;
+    };
 }
-
-function getDisplayName(Component) {
-    return Component.displayName || Component.name || 'Component';
-}
-
-export default SinglePageLayout;

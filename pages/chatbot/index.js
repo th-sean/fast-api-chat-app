@@ -1,6 +1,7 @@
 import Controller from "../../components/controller";
 import Link from "next/link";
 import { } from "react-icons/ai"
+import withLayout from "../../components/layouts/withLayout";
 
 function Chat() {
   return (
