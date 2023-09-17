@@ -1,8 +1,10 @@
-function SinglePageLayout(Component) {
+
+
+function SinglePageLayout(children) {
     return function (props) {
         return (
             <div>
-                <Component {...props} />
+                {children}
             </div>
         );
     };
