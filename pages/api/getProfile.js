@@ -10,7 +10,6 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
         });
-        console.log("can you see the profile output?" + response.data)
         res.status(200).json({
             success: true,
             message: "Profile Loaded",
