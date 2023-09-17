@@ -40,6 +40,7 @@ function LoginPage() {
   };
 
   async function getProfile() {
+
     const response = await axios.get("/api/getProfile", {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
