@@ -54,14 +54,14 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-skyblue-300">
+    <div className="min-h-screen flex flex-col md:flex-row bg-skyblue-300 ">
       {/* Left Side Content */}
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 bg-blue-600">
-        <div className="absolute top-6 left-6 text-white text-xl font-bold">
+      <div className="flex-1 flex flex-col items-center justify-center p-10 md:px-30 bg-blue-600">
+        <div className="absolute top-1 left-6 text-white text-xl font-bold p-6">
           Knowledge AI
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white w-full text-center mt-20">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white w-full text-center mt-40">
           Empower Your Documents with AI
         </h1>
         <p className="text-gray-200 mb-4 text-center">
@@ -77,16 +77,16 @@ function LoginPage() {
       </div>
 
       {/* Right Side Content */}
-      <div className="flex-1 flex justify-center items-center p-6 md:p-0">
-        <div className="bg-white p-4 md:p-8 w-full md:w-auto rounded-lg">
-          <h2 className="text-2xl md:text-3xl font-semibold mb-4">
-            Login to Knowledge AI
+      <div className="flex-1 flex p-6 md:p-5">
+        <div className="bg-white p-4 w-full lg:mt-40 md:p-8 md:min-w-[400px] ">
+          <h2 className="text-2xl md:text-3xl font-bold  mb-10">
+            Login to KnowledgeAI
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label
                 htmlFor="username"
-                className="block text-gray-700 text-sm font-medium mb-2"
+                className="block text-gray-500 text-normal font-medium mb-2"
               >
                 Email
               </label>
@@ -94,14 +94,14 @@ function LoginPage() {
                 type="text"
                 id="username"
                 name="username"
-                className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                className="w-full p-4 text-lg border rounded-lg outline-none focus:ring-1"
                 required
               />
             </div>
             <div className="mb-2">
               <label
                 htmlFor="password"
-                className="block text-gray-700 text-sm font-medium mb-2"
+                className="block text-gray-500 text-normal font-medium mb-2"
               >
                 Password
               </label>
@@ -109,31 +109,32 @@ function LoginPage() {
                 type="password"
                 id="password"
                 name="password"
-                className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200"
+                className="w-full p-4 text-lg border rounded-lg focus:outline-none focus:ring-1" // Increased padding and removed focus ring here
                 required
               />
             </div>
             {message && <p className="text-xs text-red-500 mb-3">{message}</p>}
-            <div className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
+            <div className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 mt-10">
               <button
                 className="w-full text-white font-bold py-2 px-4 rounded"
                 type="submit"
               >
-                Login
+                Log In
               </button>
             </div>
           </form>
-          <p className="mt-4 text-sm text-gray-600">
-            Dont have an account
+          <div className="mt-4 text-normal text-gray-600">
+            Don&apos;t have an account?
             <Link
               href="/register"
-              className="text-blue-500 font-medium hover:underline"
+              className="text-blue-500 font-medium hover:underline ml-1"
             >
               Register here
             </Link>
-          </p>
+          </div>
         </div>
       </div>
+      <div className="w-1/5"></div>
     </div>
   );
 }
