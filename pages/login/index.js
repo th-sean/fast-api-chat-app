@@ -65,7 +65,7 @@ function LoginPage() {
           Empower Your Documents with AI
         </h1>
         <p className="text-gray-200 mb-4 text-center">
-          Upload your documents and let our AI analyze them. We'll find the
+          Upload your documents and let our AI analyze them. We&lsquo;ll find the
           right documents for you, provide valuable accounting information, and
           more.
         </p>
