@@ -70,6 +70,7 @@ function Controller() {
         window.alert(response.data.detail);
       }
     } catch (error) {
+      popChatArray(); 
       if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
           const timeoutMessage = {
               sender: "bot",
