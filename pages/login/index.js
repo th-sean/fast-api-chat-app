@@ -57,24 +57,24 @@ function LoginPage() {
     <div className="min-h-screen flex flex-col md:flex-row bg-skyblue-300">
       {/* Left Side Content */}
 
-   
-        <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 bg-blue-600">
-        <div className="absolute top-6 left-6 text-white text-xl font-bold">Knowledge AI</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white w-full text-center mt-20">
-            Empower Your Documents with AI
-          </h1>
-          <p className="text-gray-200 mb-4 text-center">
-            Upload your documents and let our AI analyze them. We'll find the
-            right documents for you, provide valuable accounting information,
-            and more.
-          </p>
-          <LottieAnimation
-            animationData={animationData}
-            width={500}
-            height={500}
-          />
+      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 bg-blue-600">
+        <div className="absolute top-6 left-6 text-white text-xl font-bold">
+          Knowledge AI
         </div>
-    
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white w-full text-center mt-20">
+          Empower Your Documents with AI
+        </h1>
+        <p className="text-gray-200 mb-4 text-center">
+          Upload your documents and let our AI analyze them. We'll find the
+          right documents for you, provide valuable accounting information, and
+          more.
+        </p>
+        <LottieAnimation
+          animationData={animationData}
+          width={500}
+          height={500}
+        />
+      </div>
 
       {/* Right Side Content */}
       <div className="flex-1 flex justify-center items-center p-6 md:p-0">
