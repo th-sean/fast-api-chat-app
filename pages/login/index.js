@@ -124,7 +124,7 @@ function LoginPage() {
             </div>
           </form>
           <p className="mt-4 text-sm text-gray-600">
-            {"Don't have an account?"}
+          {"Don&rsquo;t have an account?"}
             <Link
               href="/register"
               className="text-blue-500 font-medium hover:underline"
