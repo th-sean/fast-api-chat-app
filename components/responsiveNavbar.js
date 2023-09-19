@@ -132,13 +132,17 @@ function Navbar({accessToken}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [token, setToken] = useState("");
-  const [username, setUsername] = useState("")
+  
   const router = useRouter(); // Get the router object
+  const [username, setUsername] = useState("")
   const [showCreateModal, setShowCreateModal] = useState(false);
   const loadedUsername = useAccountInfoStore((state) => state.username) || "";
   
   useEffect(() => {
     setToken(accessToken);
+    if (loadedUsername.length < 1) {
+      setUsername(loadedUsername);
+    }
     setUsername(loadedUsername)
     const currentTabIndex = tabs.findIndex(
       (tab) => tab.link === router.pathname
