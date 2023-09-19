@@ -31,9 +31,9 @@ function LoginPage() {
       setMessage(response.data.message);
       sessionStorage.setItem("accessToken", response.data.accessToken);
       console.log("getprofile here");
-      await getProfile;
-
-      window.location.href = "/upload";
+      await getProfile();
+      window.location.href = "/chatbot";
+      
     } catch (error) {
       // setMessage(error.response.data.message);
     }
@@ -45,12 +45,13 @@ function LoginPage() {
         Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
       },
     });
+      console.log("did you get username from getRPfoeil?" + username)
+      if (response.data.success) {
+        sessionStorage.setItem("name", response.data.response.username);
+        
+      } else {
 
-    if (response.data.success) {
-      const username = response.data.response.username;
-      setUsername(username);
-    } else {
-    }
+      }
   }
 
   return (

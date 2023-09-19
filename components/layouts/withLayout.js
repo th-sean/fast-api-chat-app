@@ -6,14 +6,16 @@ import { useState, useEffect } from "react";
 function withLayout(WrappedComponent, layoutType) {
   return function LayoutWrapper(props) {
     const [accessToken, setAccessToken] = useState("");
+    const [nameString, setNameString] = useState("")
 
     useEffect(() => {
       setAccessToken(sessionStorage.getItem("accessToken") || "");
+      setNameString(sessionStorage.getItem("name") || "")
     }, []);
 
     if (layoutType === "dashboard") {
       return (
-        <DashboardLayout accessToken={accessToken}>
+        <DashboardLayout accessToken={accessToken} name={nameString}>
           <WrappedComponent {...props} accessToken={accessToken} />
         </DashboardLayout>
       );

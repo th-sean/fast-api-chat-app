@@ -128,29 +128,33 @@ const handleLogout = () => {
  
 }
 
-function Navbar({accessToken}) {
+function Navbar({accessToken, name}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [token, setToken] = useState("");
   
   const router = useRouter(); // Get the router object
-  const [username, setUsername] = useState("")
+  const [nameString, setNameString] = useState("")
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const loadedUsername = useAccountInfoStore((state) => state.username) || "";
+  // const loadedUsername = useAccountInfoStore((state) => state.username) || "";
   
   useEffect(() => {
     setToken(accessToken);
-    if (loadedUsername.length < 1) {
-      setUsername(loadedUsername);
-    }
-    setUsername(loadedUsername)
+    console.log("this is name "+ nameString)
+    // if (loadedUsername.length < 1) {
+    //   console.log("No username loaded yet: " + loadedUsername);
+      
+    // } else {
+    //   console.log("Loaded username: " + loadedUsername);
+    //   setName(loadedUsername)
+    // }
     const currentTabIndex = tabs.findIndex(
       (tab) => tab.link === router.pathname
     );
     if (currentTabIndex !== -1) {
       setSelectedTabIndex(currentTabIndex);
     }
-  }, [token, router.pathname], loadedUsername);
+  }, [token, router.pathname]);
 
   return (
     <div className="">
@@ -161,10 +165,10 @@ function Navbar({accessToken}) {
           <div className="flex items-center justify-between h-12 px-4 border-gray-200 hover:bg-gray-100 border-b">
             <div className="flex items-center ">
               <div className="bg-green-800 text-xs w-6 h-6 aspect-1 rounded-full font-bold text-white flex items-center justify-center">
-                {firstLetterCapitalized(username)}
+                {firstLetterCapitalized(name)}
               </div>
               <div className="text-black-800 truncate ml-2 font-medium">
-                {username}
+                {name}
               </div>
             </div>
             <Link href={"/login"} className="text-sm" onClick={handleLogout}>

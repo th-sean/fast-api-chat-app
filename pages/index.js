@@ -11,7 +11,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/chatbot');
+    router.replace('/login');
   }, []);
 
   return null;  // Render nothing for this component
