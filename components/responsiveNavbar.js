@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   AiOutlineMenu,
@@ -76,6 +76,62 @@ const TabItems = ({
 };
 
 const CreateContentModal = ({ showModal, setShowCreateModal }) => {
+  const fileInput = useRef(null);
+  const [filesUpload, setFilesUpload] = useState([]);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  function handleFileChange(event) {
+    setFilesUpload([...event.target.files]);
+    console.log("this is files" + filesUpload.name);
+    handleFilesUpload([...event.target.files]);
+  }
+
+  async function handleFileChoose() {
+    fileInput.current.click();
+  }
+
+  async function handleFilesUpload(files) {
+    setUploadStatus("in-progress");
+    console.log("handleFilesUpload " + filesUpload);
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const response = await axios.post(
+        "/api/upload/postFilesUpload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken") || ""}`,
+          },
+          onUploadProgress: (progressEvent) => {
+            setUploadProgress(progressEvent);
+            console.log(progressEvent);
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setUploadStatus("completed");
+        console.log("upload completed");
+        
+      }
+    } catch (error) {
+      console.error("Error uploading:", error);
+      setUploadStatus("failed");
+
+      const errorMessage =
+        error.response?.data?.message || "Failed to upload. Please try again.";
+        setUploadStatus(errorMessage);
+
+      setUploadProgress(-1);
+      
+    }
+  }
+
   return (
     showModal && (
       <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
@@ -89,7 +145,10 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-6 p-6 border-b">
-            <button className="p-4 ring-1 ring-gray-200 rounded-2xl text-left space-y-3 hover:ring-gray-300 active:ring-gray-400">
+            <button
+              className="p-4 ring-1 ring-gray-200 rounded-2xl text-left space-y-3 hover:ring-gray-300 active:ring-gray-400"
+              onClick={handleFileChoose}
+            >
               <div className="flex items-center space-x-3">
                 <FaFileLines className="w-4 h-4 text-blue-800" />
                 <div className="text-indigo-700 text-base font-semibold">
@@ -97,6 +156,13 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
                 </div>
               </div>
               <div>Upload your files from local device (.pdf, .png, .html)</div>
+              <input
+                type="file"
+                ref={fileInput}
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+                multiple
+              ></input>
             </button>
             <button className="p-4 ring-1 ring-gray-200 rounded-2xl text-left space-y-3 hover:ring-gray-300 active:ring-gray-400">
               <div className="flex items-center space-x-3">
@@ -108,7 +174,8 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
               <div>Get your files securely from Google drive</div>
             </button>
           </div>
-          <div className="flex justify-end p-6">
+          <div className="flex justify-between p-6">
+            <div className="flex-start">{uploadStatus}</div>
             <button
               className="transition-all duration-200 relative font-medium shadow-sm outline-none hover:outline-none focus:outline-none rounded-lg px-4 py-2 text-base bg-white text-gray-600 ring-1 ring-gray-200 hover:ring-2 active:ring-1"
               onClick={() => setShowCreateModal(false)}
@@ -125,25 +192,23 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
 };
 const handleLogout = () => {
   sessionStorage.setItem("accessToken", "");
- 
-}
+};
 
-function Navbar({accessToken, name}) {
+function Navbar({ accessToken, name }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [token, setToken] = useState("");
-  
   const router = useRouter(); // Get the router object
-  const [nameString, setNameString] = useState("")
+  const [nameString, setNameString] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   // const loadedUsername = useAccountInfoStore((state) => state.username) || "";
-  
+
   useEffect(() => {
     setToken(accessToken);
-    console.log("this is name "+ nameString)
+    console.log("this is name " + nameString);
     // if (loadedUsername.length < 1) {
     //   console.log("No username loaded yet: " + loadedUsername);
-      
+
     // } else {
     //   console.log("Loaded username: " + loadedUsername);
     //   setName(loadedUsername)
@@ -183,7 +248,6 @@ function Navbar({accessToken, name}) {
             setShowCreateModal={setShowCreateModal}
           />
         </div>
-      
 
         <div className="flex-grow overflow-y-auto">
           <div className="text-sm text-gray-600 pl-5 pt-2">Chat</div>
@@ -192,9 +256,7 @@ function Navbar({accessToken, name}) {
               className="transition-all duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-600 hover:ring-2 active:ring-0 w-full"
               onClick={() => {}}
             >
-              <Link href={"/chatbot"}>
-            New Conversation
-          </Link>
+              <Link href={"/chatbot"}>New Conversation</Link>
             </button>
           </div>
         </div>
@@ -208,7 +270,6 @@ function Navbar({accessToken, name}) {
             onClick={() => setDrawerOpen(false)}
           >
             <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-md z-10 transition-transform transform translate-x-0 transition duration-300 custom:hidden">
-              
               <TabItems
                 setSelectedTabIndex={setSelectedTabIndex}
                 selectedTabIndex={selectedTabIndex}
@@ -240,6 +301,6 @@ function Navbar({accessToken, name}) {
       />
     </div>
   );
-};
+}
 
 export default Navbar;

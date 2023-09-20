@@ -75,20 +75,6 @@ function UploadPage({ accessToken }) {
     setShowUploadDropdown(null);
   }
 
-  const handlePromptOpen = () => {
-    setShowUploadDropdown(false);
-    setIsPromptModalOpen(true);
-  };
-
-  // const toggleKebabDropdown = (event, index, docId) => {
-  //   event.stopPropagation();
-  //   if (showKebabDropdown !== index) {
-  //     setSelectedID(docId); // Set the selectedID here
-  //     console.log("ID Selected :" + docId);
-  //   }
-  //   setShowKebabDropdown(index === showKebabDropdown ? null : index);
-  // };
-
   async function handleFilesUpload(files) {
     setUploadStatus("in-progress");
     console.log("handleFilesUpload " + filesUpload);
@@ -129,7 +115,7 @@ function UploadPage({ accessToken }) {
       fetchUploadedDocuments(accessToken);
      
     }
-}
+  }
 
   async function fetchUploadedDocuments(token) {
     console.log("Get documentList");
