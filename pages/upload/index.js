@@ -25,7 +25,7 @@ function UploadPage({ accessToken }) {
   const [selectedID, setSelectedID] = useState(null);
   const [deleteStatus, setDeleteStatus] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
-  const [uploadMessage, setUploadMessage] = useState("")
+  const [uploadMessage, setUploadMessage] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -103,17 +103,16 @@ function UploadPage({ accessToken }) {
         console.log("upload completed");
         fetchUploadedDocuments(accessToken);
       }
-  
     } catch (error) {
       console.error("Error uploading:", error);
       setUploadStatus("failed");
-        
-      const errorMessage = error.response?.data?.message || "Failed to upload. Please try again.";
+
+      const errorMessage =
+        error.response?.data?.message || "Failed to upload. Please try again.";
       setUploadMessage(errorMessage);
-  
+
       setUploadProgress(-1);
       fetchUploadedDocuments(accessToken);
-     
     }
   }
 
@@ -324,22 +323,42 @@ function UploadPage({ accessToken }) {
                           onClick={() => {
                             downloadDocumentClick(item.id);
                           }}
+                          className="relative transform transition-transform hover:scale-105 active:scale-95"
                         >
-                          <PiDownloadSimpleDuotone />
+                          <div className="relative group">
+                            <PiDownloadSimpleDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Download
+                            </div>
+                          </div>
                         </button>
                         <button
                           onClick={() => {
                             summarizeDocumentClick(item.id);
                           }}
                         >
-                          <PiQueueDuotone />
+                          <div className="relative group">
+                            <PiQueueDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Summarize
+                            </div>
+                          </div>
                         </button>
                         <button
                           onClick={() => {
                             deleteDocumentClick(item.id);
                           }}
                         >
-                          <PiTrashDuotone />
+                          <div className="relative group">
+                            <PiTrashDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Delete
+                            </div>
+                          </div>
+
                           <Modal
                             className="modal"
                             isOpen={deleteModalOpen && selectedID == item.id}
@@ -408,18 +427,17 @@ function UploadPage({ accessToken }) {
                   <Spinner className="" size={`w-5 h-5`} />{" "}
                   <div className="ml-1 text-xl">Uploading</div>{" "}
                 </div>
-              ) : uploadStatus === "redundant" ?(
+              ) : uploadStatus === "redundant" ? (
                 <div>
                   <div className="flex items-center justify-center">
-                    <PiWarningDuotone className="text-xl mr-1"/>
+                    <PiWarningDuotone className="text-xl mr-1" />
                     <div>{uploadMessage}</div>
                   </div>
-                  
                 </div>
               ) : (
                 <div>
                   <div className="flex items-center justify-center">
-                    <PiWarningDuotone className="mr-1"/>
+                    <PiWarningDuotone className="mr-1" />
                     <div>{uploadMessage}</div>
                   </div>
                 </div>
