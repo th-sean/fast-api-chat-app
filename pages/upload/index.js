@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { BsUpload, BsFilter } from "react-icons/bs";
 import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
 import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
 import {
@@ -10,6 +9,7 @@ import {
   PiDownloadSimpleDuotone,
   PiQueueDuotone,
   PiFileTextBold,
+  PiWarningDuotone,
 } from "react-icons/pi";
 
 import { CiMenuKebab } from "react-icons/ci";
@@ -25,6 +25,7 @@ function UploadPage({ accessToken }) {
   const [selectedID, setSelectedID] = useState(null);
   const [deleteStatus, setDeleteStatus] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("")
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -96,27 +97,40 @@ function UploadPage({ accessToken }) {
       formData.append("files", file);
     });
 
-    const response = await axios.post("/api/upload/postFilesUpload", formData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      onUploadProgress: (progressEvent) => {
-        setUploadProgress(progressEvent);
-        console.log(progressEvent);
-      },
-    });
+    try {
+      const response = await axios.post(
+        "/api/upload/postFilesUpload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          onUploadProgress: (progressEvent) => {
+            setUploadProgress(progressEvent);
+            console.log(progressEvent);
+          },
+        }
+      );
 
-    if (response.status === 200) {
-      setUploadStatus("completed");
-      console.log("upload completed");
-      fetchUploadedDocuments();
-    } else {
+      if (response.status === 200) {
+        setUploadStatus("completed");
+        console.log("upload completed");
+        fetchUploadedDocuments(accessToken);
+      }
+  
+    } catch (error) {
+      console.error("Error uploading:", error);
       setUploadStatus("failed");
-      console.log("fetching document");
+        
+      const errorMessage = error.response?.data?.message || "Failed to upload. Please try again.";
+      setUploadMessage(errorMessage);
+  
       setUploadProgress(-1);
-      fetchUploadedDocuments();
+      fetchUploadedDocuments(accessToken);
+     
     }
-  }
+}
+
   async function fetchUploadedDocuments(token) {
     console.log("Get documentList");
     console.log("this is accessToken from parameter" + token);
@@ -186,18 +200,18 @@ function UploadPage({ accessToken }) {
       if (response.status === 200) {
         console.log("Deleted document");
         setDeleteStatus("complete");
-        fetchUploadedDocuments();
+        fetchUploadedDocuments(accessToken);
         setDeleteModalOpen(false);
       } else {
         console.log("it is not 200");
         setDeleteStatus("complete");
-        fetchUploadedDocuments();
+        fetchUploadedDocuments(accessToken);
         setDeleteModalOpen(false);
       }
     } catch (error) {
       console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
-      fetchUploadedDocuments();
+      fetchUploadedDocuments(accessToken);
       setDeleteModalOpen(false);
       alert("Failed to Delete File.");
     }
@@ -400,7 +414,7 @@ function UploadPage({ accessToken }) {
       {showPopup && (
         <div className="fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold overflow-hidden truncate">
+            <h2 className="text-lg font-bold overflow-hidden truncate">
               {uploadStatus === "completed" ? (
                 "Completed"
               ) : uploadStatus === "in-progress" ? (
@@ -408,8 +422,21 @@ function UploadPage({ accessToken }) {
                   <Spinner className="" size={`w-5 h-5`} />{" "}
                   <div className="ml-1 text-xl">Uploading</div>{" "}
                 </div>
+              ) : uploadStatus === "redundant" ?(
+                <div>
+                  <div className="flex items-center justify-center">
+                    <PiWarningDuotone className="text-xl mr-1"/>
+                    <div>{uploadMessage}</div>
+                  </div>
+                  
+                </div>
               ) : (
-                "Failed to upload"
+                <div>
+                  <div className="flex items-center justify-center">
+                    <PiWarningDuotone className="mr-1"/>
+                    <div>{uploadMessage}</div>
+                  </div>
+                </div>
               )}
             </h2>
             <button

@@ -52,7 +52,7 @@ const TabItems = ({
           className="transition-all duration-200 relative font-semibold shadow-sm outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm bg-blue-600 text-white ring-0 ring-blue-600 hover:ring-2 active:ring-0 w-full"
           onClick={() => setShowCreateModal(true)}
         >
-          + Create content
+          + Upload documents
         </button>
       </div>
       {tabs.map((tab, index) => (
@@ -82,7 +82,7 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
         <div className="bg-white rounded">
           <div className="p-6 space-y-4 border-b">
             <h1 className="mb-2 text-lg font-semibold text-gray-900">
-              Upload new content...
+              Upload new document...
             </h1>
             <p className="text-sm font-normal text-gray-600">
               You can upload document from local device or Google drive
