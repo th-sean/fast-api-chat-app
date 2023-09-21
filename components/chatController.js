@@ -39,11 +39,6 @@ function ChatController({
     setInputText(event.target.value);
   };
 
-  const handleEnter = (event) => {
-    if (event.key === "Enter") {
-      handleClick();
-    }
-  };
   const handleHandleInstruction = (itemText) => () => {
     setInputText(itemText);
   };
@@ -51,6 +46,18 @@ function ChatController({
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   };
+
+  const handleEnter = (event) => {
+    if (event.key === "Enter") {
+      if (event.shiftKey) {
+        
+      } else {
+        event.preventDefault(); 
+        handleClick(); 
+      }
+    }
+  };
+
   useEffect(() => {
     scrollToBottom;
   }, [messages]);
@@ -196,6 +203,7 @@ function ChatController({
               }
               value={inputText}
               onChange={handleInputChange}
+              onKeyDown={handleEnter}
             />
           </div>
           <div className="flex gap-2 justify-between p-2.5 bg-white border-b rounded-b-lg">

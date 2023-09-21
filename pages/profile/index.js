@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AuthNotFound from "../../components/authNotfound";
-
+import useAccountInfoStore from "../../stores/store";
 
 function ProfilePage() {
   const [message, setMessage] = useState("Show Info");
   const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
-
+  const setUsername = useAccountInfoStore((state) => state.setUsername);
   useEffect(() => {
     setToken(sessionStorage.getItem("accessToken"));
     
@@ -25,7 +25,7 @@ function ProfilePage() {
     if (response.data.success) {
       setMessage(response.data.message);
       setUserInfo(response.data.response);
-
+      setUsername(response.data.response.username)
    
     
     } else {
@@ -47,7 +47,7 @@ function ProfilePage() {
     };
     try {
       const response = await axios.post(
-        "http://54.193.180.218:8000/set_api",
+        "http://54.193.180.218:8001/set_api",
         bodyRequest,
         {
           headers: {

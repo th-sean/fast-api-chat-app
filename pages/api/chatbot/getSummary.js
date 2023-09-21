@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const {selectedId}  = req.body
     console.log("this is selected id " + selectedId)
     try {
-        const response = await axios.get(`http://54.193.180.218:8000/summary/${selectedId}`, {
+        const response = await axios.get(`http://54.193.180.218:8001/summary/${selectedId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 // const fetchSummary = async (id) => {
 //     setIsLoading(true);
 //     try {
-//       const res = await fetch(`http://54.193.180.218:8000/summary/${id}`, {
+//       const res = await fetch(`http://54.193.180.218:8001/summary/${id}`, {
 //         method: "GET",
 //         headers: {
 //           "Content-Type": "application/json",

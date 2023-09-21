@@ -2,65 +2,66 @@ import React, { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { BsUpload, BsFilter } from "react-icons/bs";
 import { AiOutlineDelete, AiOutlineClose } from "react-icons/ai";
-import { HiOutlineDocumentText } from "react-icons/hi";
+import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
+import {
+  PiTrashDuotone,
+  PiDownloadSimpleDuotone,
+  PiQueueDuotone,
+  PiFileTextBold,
+  PiWarningDuotone,
+} from "react-icons/pi";
+
 import { CiMenuKebab } from "react-icons/ci";
 import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
 import useChatInfoStore from "../../stores/chatStore";
+import withLayout from "../../components/layouts/withLayout";
 
-// import ReactQuill from "react-quill";
-// import "react-quill/dist/quill.snow.css";
-
-function UploadPage() {
+function UploadPage({ accessToken }) {
   const [filesUpload, setFilesUpload] = useState([]);
   const [documentList, setDocumentList] = useState([]);
-  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
-  const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedID, setSelectedID] = useState(null);
-  const [fileInfoToDelete, setFileInfoToDelete] = useState(null);
-  const [PromptModalTitle, setPromptModalTitle] = useState("");
-  const [PromptModalBody, setPromptModalBody] = useState("");
   const [deleteStatus, setDeleteStatus] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [showPopup, setShowPopup] = useState(false);
   const fileInput = useRef(null);
   const [showUploadDropdown, setShowUploadDropdown] = useState(false);
-  const [showKebabDropdown, setShowKebabDropdown] = useState(false);
   const dropdownUploadRef = useRef(false);
-  const dropdownKebabRef = useRef(false);
   const setSummarizeId = useChatInfoStore((state) => state.setSummarizeId);
-  const router = useRouter()
-  const openDeleteModal = (item, fileId) => {
-    setDeleteConfirmOpen(true);
+  const router = useRouter();
+
+  // const selectDocument = (fileId) => {
+  //   setSelectedID(fileId)
+  //   console.log("this is document selected " +selectedID )
+  // }
+
+  const downloadDocumentClick = (fileId) => {
+    console.log("this is selected ID from click" + fileId);
+    setSelectedID(fileId);
+    getDownloadDocument(fileId);
+  };
+  const summarizeDocumentClick = (fileId) => {
+    setSelectedID(fileId);
+    setSummarizeId(fileId);
+    router.push("/chatbot");
   };
 
-  const [editorContent, setEditorContent] = useState("");
+  const deleteDocumentClick = (fileId) => {
+    setSelectedID(fileId);
+    setDeleteModalOpen(true);
+  };
 
   useEffect(() => {
-    fetchUploadedDocuments();
-    const handleClickOutside = (event) => {
-      const isOutsideUploadDropdown =
-        showUploadDropdown &&
-        dropdownUploadRef.current &&
-        !dropdownUploadRef.current.contains(event.target);
-      const isOutsideKebabDropdown =
-        showKebabDropdown !== null &&
-        dropdownKebabRef.current &&
-        !dropdownKebabRef.current.contains(event.target);
-
-      if (isOutsideUploadDropdown || isOutsideKebabDropdown) {
-        handleCloseDropdowns();
-      }
-    };
-    document.body.addEventListener("click", handleClickOutside);
-    return () => {
-      document.body.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
+    console.log("here is from props: " + accessToken);
+    if (accessToken) {
+      fetchUploadedDocuments(accessToken);
+    }
+  }, [accessToken]);
 
   async function handleFileChoose() {
     fileInput.current.click();
@@ -70,34 +71,9 @@ function UploadPage() {
     setFilesUpload([...event.target.files]);
     console.log("this is files" + filesUpload.name);
     handleFilesUpload([...event.target.files]);
-    // handleFilesUpload();
     setShowPopup(true);
     setShowUploadDropdown(null);
   }
-
-  const handlePromptOpen = () => {
-    setShowUploadDropdown(false);
-    setIsPromptModalOpen(true);
-  };
-
-  const toggleUploadDropdown = (event) => {
-    event.stopPropagation();
-    setShowUploadDropdown(!showUploadDropdown);
-  };
-
-  const toggleKebabDropdown = (event, index, docId) => {
-    event.stopPropagation();
-    if (showKebabDropdown !== index) {
-      setSelectedID(docId); // Set the selectedID here
-      console.log("ID Selected :" + docId);
-    }
-    setShowKebabDropdown(index === showKebabDropdown ? null : index);
-  };
-
-  const handleCloseDropdowns = () => {
-    setShowKebabDropdown(null);
-    setShowUploadDropdown(false);
-  };
 
   async function handleFilesUpload(files) {
     setUploadStatus("in-progress");
@@ -107,64 +83,45 @@ function UploadPage() {
       formData.append("files", file);
     });
 
-    const response = await axios.post("/api/upload/postFilesUpload", formData, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-      },
-      onUploadProgress: (progressEvent) => {
-        setUploadProgress(progressEvent);
-        console.log(progressEvent);
-      },
-    });
+    try {
+      const response = await axios.post(
+        "/api/upload/postFilesUpload",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          onUploadProgress: (progressEvent) => {
+            setUploadProgress(progressEvent);
+            console.log(progressEvent);
+          },
+        }
+      );
 
-    if (response.status === 200) {
-      setUploadStatus("completed");
-      console.log("upload completed");
-      fetchUploadedDocuments();
-    } else {
+      if (response.status === 200) {
+        setUploadStatus("completed");
+        console.log("upload completed");
+        fetchUploadedDocuments(accessToken);
+      }
+    } catch (error) {
+      console.error("Error uploading:", error);
       setUploadStatus("failed");
-      console.log("fetching document");
+
+      const errorMessage =
+        error.response?.data?.message || "Failed to upload. Please try again.";
+      setUploadMessage(errorMessage);
+
       setUploadProgress(-1);
-      fetchUploadedDocuments();
+      fetchUploadedDocuments(accessToken);
     }
   }
 
-  async function handleFileUpload(file) {
-    if (!file) return;
-
-    setUploadStatus("in-progress");
-
-    const formData = new FormData();
-    formData.append("file", file[0]);
-    console.log();
-    const response = await axios.post("/api/upload/postFileUpload", formData, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-      },
-      onUploadProgress: (progressEvent) => {
-        setUploadProgress(progressEvent);
-      },
-    });
-
-    if (response.status === 200) {
-      setUploadStatus("completed");
-      console.log("upload completed");
-      fetchUploadedDocuments();
-    } else {
-      setUploadStatus("failed");
-      console.log("fetching document");
-      setUploadProgress(-1);
-      fetchUploadedDocuments();
-    }
-  }
-
-  async function handlePromptSubmit() {}
-
-  async function fetchUploadedDocuments() {
+  async function fetchUploadedDocuments(token) {
     console.log("Get documentList");
+    console.log("this is accessToken from parameter" + token);
     const response = await axios.get("/api/upload/getDocumentsList", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
@@ -175,14 +132,14 @@ function UploadPage() {
     }
   }
 
-  async function getDownloadDocument() {
-    if (!selectedID) return;
+  async function getDownloadDocument(id) {
+    if (!id) return;
 
-    console.log("this is download document id" + selectedID);
+    console.log("this is download document id" + id);
     try {
       const response = await axios.post(
         `/api/upload/getDownloadDocument`,
-        { selectedId: selectedID },
+        { selectedId: id },
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
@@ -228,81 +185,84 @@ function UploadPage() {
       if (response.status === 200) {
         console.log("Deleted document");
         setDeleteStatus("complete");
-        fetchUploadedDocuments();
-        setDeleteConfirmOpen(false);
+        fetchUploadedDocuments(accessToken);
+        setDeleteModalOpen(false);
       } else {
         console.log("it is not 200");
         setDeleteStatus("complete");
-        fetchUploadedDocuments();
-        setDeleteConfirmOpen(false);
+        fetchUploadedDocuments(accessToken);
+        setDeleteModalOpen(false);
       }
     } catch (error) {
       console.error("Error during document deletion:", error);
       setDeleteStatus("complete");
-      fetchUploadedDocuments();
-      setDeleteConfirmOpen(false);
+      fetchUploadedDocuments(accessToken);
+      setDeleteModalOpen(false);
       alert("Failed to Delete File.");
     }
   }
 
-  function redirectToChatbot(file_id) {
-    setSummarizeId(file_id)
-    router.push('/chatbot')
-  }
-
   return (
-    <div className="py-8 px-10 bg-slate-100">
-      <div className="bg-white p-5 rounded-lg ">
-        <div className="text-lg font-bold p-2">All fies </div>
-        <div className="flex flex-wrap w-full items-center justify-between">
-          <div className="relative mb-2 md:mb-0 flex">
-            {/* Title Button */}
-
-            <button
-              onClick={(e) => toggleUploadDropdown(e)}
-              className="mt-2 md:mt-0 px-4 py-2 bg-blue-500 text-white rounded hover:bg-gray-300 flex"
-            >
-              <BsUpload className="text-xl mr-3" />
-              <div>Upload</div>
-            </button>
-
-            {/* Dropdown Menu */}
-            {showUploadDropdown && (
-              <div
-                ref={dropdownUploadRef}
-                className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded shadow-lg"
-              >
-                <ul>
-                  <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handleFileChoose}
-                  >
-                    <div>Document</div>
-                    <input
-                      type="file"
-                      ref={fileInput}
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                      multiple
-                    ></input>
-                  </li>
-                  <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handlePromptOpen}
-                  >
-                    <div>Prompt</div>
-                  </li>
-                </ul>
-              </div>
-            )}
+    <div className="">
+      <div className="bg-white ">
+        <div className="border-b">
+          <div className="text-3xl text-gray-800 font-bold pl-10 pt-5">
+            Your content{" "}
           </div>
+          <div className="pl-10 pt-2 mb-5 text-gray-500 text-regular">
+            Once a document is uploaded, the chatbot can access and reference
+            its content during conversations, ensuring a more personalized and
+            knowledgeable response system. It supports formats such as .pdf,
+            .png, and .html.
+          </div>
+        </div>
 
-          <div className="w-full md:w-1/3 relative mt-2 md:mt-0 ">
+        <div className="flex flex-wrap items-center justify-between">
+          <div className="relative mb-2 md:mb-0 flex">
+            <div className="grid grid-cols-2 gap-6 p-6">
+              <button
+                className="p-4 ring-1 ring-gray-200 rounded-2xl text-left space-y-3 hover:ring-gray-300 active:ring-gray-400 min-w-fit"
+                onClick={handleFileChoose}
+              >
+                <div className="flex items-center space-x-3">
+                  <FaFileLines className="w-4 h-4 text-blue-800" />
+                  <div className="text-indigo-700 text-base font-semibold">
+                    + Upload document
+                  </div>
+                </div>
+                <div>
+                  Upload your files from local device (.pdf, .png, .html)
+                </div>
+                <input
+                  type="file"
+                  ref={fileInput}
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                  multiple
+                ></input>
+              </button>
+              <button className="p-4 ring-1 ring-gray-200 rounded-2xl text-left space-y-3 hover:ring-gray-300 active:ring-gray-400">
+                <div className="flex items-center space-x-3">
+                  <FaGoogleDrive className="w-4 h-4 text-red-800" />
+                  <div className="text-red-700 text-base font-semibold">
+                    + Google drive
+                  </div>
+                </div>
+                <div>Get your files securely from Google drive</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr></hr>
+      <div className="bg-white p-5">
+        <div>
+          <div className="w-full md:w-1/3 relative mt-2 mb-3 md:mt-0 ">
             {/* Input Field */}
             <input
               type="text"
               className="border rounded-md w-full pl-10 pr-4 py-2 focus:border-blue-400 focus:outline-none"
-              placeholder="Search..."
+              placeholder="Search content"
             />
 
             {/* Absolute-positioned icon */}
@@ -310,144 +270,156 @@ function UploadPage() {
               <FaSearch />
             </div>
           </div>
-        </div>
-        <Modal
-          isOpen={isPromptModalOpen}
-          onRequestClose={() => setIsPromptModalOpen(false)}
-          className="modal"
-          overlayClassName="modal-overlay"
-        >
-          <h2>File name</h2>
-          <input
-            type="text"
-            value={PromptModalTitle}
-            onChange={(e) => setPromptModalTitle(e.target.value)}
-          />
-          <h2>Modal Body</h2>
-          {/* <ReactQuill value={editorContent} onChange={setEditorContent} /> */}
-          <button onClick={handlePromptSubmit}>Submit</button>
-        </Modal>
-      </div>
-      <hr></hr>
-      <div className="bg-white p-5 rounded-lg mt-4">
-        <div>
+          <div className="outline outline-1 outline-gray-200 rounded-lg w-full">
+            <div className="w-full space-y-1"></div>
+            <table className="min-w-full divide-y divide-gray-200 border rounded-md">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="w-12 p-3.5"></th>
+                  <th className="w-12 px-3.5 py-3.5"></th>
+                  <th className="text-left text-xs font-semibold text-gray-700 uppercase">
+                    Filename
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-700 uppercase">
+                    Created Date
+                  </th>
+                  <th className="w-12 px-3.5 py-3.5 bg-gray-50"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {documentList &&
+                  documentList.map((item, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="">
+                        <label className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600"
+                          />
+                        </label>
+                      </td>
+                      <td className="items-center justify-center">
+                        {deleteStatus === "in-progress" &&
+                        selectedID === item.id ? (
+                          <Spinner
+                            className="mr-5"
+                            size={`w-5 h-5`}
+                            tintColor={"fill-red-600"}
+                            bgColor={"dark:text-gray-200"}
+                          />
+                        ) : (
+                          <div className="text-sm ">
+                            <PiFileTextBold />
+                          </div>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">
+                        {item.file_name}
+                      </td>
+                      <td className="">-</td>
+                      <td className="py-3 px-4 flex space-x-4">
+                        <div className="flex"></div>
+                        <button
+                          onClick={() => {
+                            downloadDocumentClick(item.id);
+                          }}
+                          className="relative transform transition-transform hover:scale-105 active:scale-95"
+                        >
+                          <div className="relative group">
+                            <PiDownloadSimpleDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Download
+                            </div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            summarizeDocumentClick(item.id);
+                          }}
+                        >
+                          <div className="relative group">
+                            <PiQueueDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Summarize
+                            </div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            deleteDocumentClick(item.id);
+                          }}
+                        >
+                          <div className="relative group">
+                            <PiTrashDuotone />
+
+                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              Delete
+                            </div>
+                          </div>
+
+                          <Modal
+                            className="modal"
+                            isOpen={deleteModalOpen && selectedID == item.id}
+                            onRequestClose={() => setDeleteModalOpen(false)}
+                            overlayClassName="modal-overlay"
+                          >
+                            <h2 className="text-lg font-bold">
+                              Are you sure you want to delete the file?
+                            </h2>
+                            <p className="text-xs mt-5">
+                              Are you sure you want to delete{" "}
+                              <strong>{" " + item.file_name}</strong> ?
+                            </p>
+                            <div className="flex justify-end mt-5">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteModalOpen(false);
+                                }}
+                                className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={deleteDocument}
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                              >
+                                {deleteStatus === "completed" ? (
+                                  "Completed"
+                                ) : deleteStatus === "in-progress" ? (
+                                  <div className="flex items-center justify-center">
+                                    <Spinner
+                                      className=""
+                                      size={`w-5 h-5`}
+                                      tintColor={"fill-white"}
+                                      bgColor={"dark:text-red-500"}
+                                    />{" "}
+                                    <div className="ml-1">Deleting</div>{" "}
+                                  </div>
+                                ) : (
+                                  "Delete"
+                                )}
+                              </button>
+                            </div>
+                          </Modal>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
           <div className="text-lg font-bold p-2 ">
             {documentList.length} Files Found
           </div>
-
-          {documentList &&
-            documentList.map((item, index) => (
-              <div
-                key={index}
-                className="relative flex border items-center font-medium p-3 rounded-lg  hover:bg-gray-100 transition duration-300 m-2"
-              >
-                <div className="flex items-center justify-center">
-                  <div className="">
-                    {deleteStatus === "in-progress" &&
-                    selectedID === item.id ? (
-                      <Spinner
-                        className="mr-5"
-                        size={`w-5 h-5`}
-                        tintColor={"fill-red-600"}
-                        bgColor={"dark:text-gray-200"}
-                      />
-                    ) : (
-                      <div className="text-xl">
-                        <HiOutlineDocumentText />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className=" ml-4 truncate">
-                    {item.file_name}
-                  </div>
-                </div>
-                <div
-                  className="ml-auto hover:bg-gray-100 p-2 rounded-lg cursor-pointer"
-                  onClick={(e) => toggleKebabDropdown(e, index, item.id)}
-                >
-                  <CiMenuKebab className="text-gray-600 text-xl" />
-                </div>
-                {showKebabDropdown === index && (
-                  <div
-                    ref={dropdownKebabRef}
-                    className="absolute text-sm top-full mt-2 w-48 right-0 bg-white border border-gray-200 rounded-lg shadow-lg "
-                  >
-                    <ul>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => getDownloadDocument()}
-                      >
-                        Download
-                      </li>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => redirectToChatbot(item.id)}
-                      >
-                        Summarize
-                      </li>
-                      <li
-                        className="p-2 text-white rounded-lg bg-red-500 hover:bg-red-600 cursor-pointer"
-                        onClick={() => openDeleteModal(item, item.id)}
-                      >
-                        Delete
-                        <Modal
-                          className="modal"
-                          isOpen={isDeleteConfirmOpen}
-                          onRequestClose={() => setDeleteConfirmOpen(false)}
-                          overlayClassName="modal-overlay"
-                        >
-                          <h2 className="text-lg font-bold">
-                            Are you sure you want to delete the file?
-                          </h2>
-                          <p className="text-xs mt-5">
-                            Are you sure you want to delete{" "}
-                            <strong>{" " + item.file_name}</strong> ?
-                          </p>
-                          <div className="flex justify-end mt-5">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteConfirmOpen(false);
-                              }}
-                              className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={deleteDocument}
-                              className="bg-red-500 text-white px-4 py-2 rounded"
-                            >
-                              {deleteStatus === "completed" ? (
-                                "Completed"
-                              ) : deleteStatus === "in-progress" ? (
-                                <div className="flex items-center justify-center">
-                                  <Spinner
-                                    className=""
-                                    size={`w-5 h-5`}
-                                    tintColor={"fill-white"}
-                                    bgColor={"dark:text-red-500"}
-                                  />{" "}
-                                  <div className="ml-1">Deleting</div>{" "}
-                                </div>
-                              ) : (
-                                "Delete"
-                              )}
-                            </button>
-                          </div>
-                        </Modal>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
         </div>
       </div>
       {showPopup && (
         <div className="fixed bottom-4 right-4 w-2/3 lg:w-1/4 p-4 bg-white border rounded-lg shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold overflow-hidden truncate">
+            <h2 className="text-lg font-bold overflow-hidden truncate">
               {uploadStatus === "completed" ? (
                 "Completed"
               ) : uploadStatus === "in-progress" ? (
@@ -455,8 +427,20 @@ function UploadPage() {
                   <Spinner className="" size={`w-5 h-5`} />{" "}
                   <div className="ml-1 text-xl">Uploading</div>{" "}
                 </div>
+              ) : uploadStatus === "redundant" ? (
+                <div>
+                  <div className="flex items-center justify-center">
+                    <PiWarningDuotone className="text-xl mr-1" />
+                    <div>{uploadMessage}</div>
+                  </div>
+                </div>
               ) : (
-                "Failed to upload"
+                <div>
+                  <div className="flex items-center justify-center">
+                    <PiWarningDuotone className="mr-1" />
+                    <div>{uploadMessage}</div>
+                  </div>
+                </div>
               )}
             </h2>
             <button
@@ -493,4 +477,4 @@ function UploadPage() {
   );
 }
 
-export default UploadPage;
+export default withLayout(UploadPage, "dashboard");

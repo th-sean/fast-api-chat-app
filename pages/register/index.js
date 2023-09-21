@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import withLayout from "../../components/layouts/withLayout";
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -123,4 +124,4 @@ function RegisterPage() {
   );
 }
 
-export default RegisterPage;
+export default withLayout(RegisterPage, "login")

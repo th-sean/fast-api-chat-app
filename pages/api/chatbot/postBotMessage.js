@@ -10,13 +10,14 @@ export default async function handler(req, res) {
   const { message } = req.body;
 
   try {
-    const response = await axios.post("http://54.193.180.218:8000/chain", {
+    const response = await axios.post("http://54.193.180.218:8001/chain", {
       message: message
     }, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       }
+      ,timeout: 180000
     });
     console.log("this is message" + response.data)
     if (response.status === 200) {
@@ -64,7 +65,7 @@ export default async function handler(req, res) {
 //     // Console log test
 //     console.log(data);
 
-//     await fetch("http://54.193.180.218:8000/chain", {
+//     await fetch("http://54.193.180.218:8001/chain", {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
