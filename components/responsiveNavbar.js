@@ -269,7 +269,7 @@ function Navbar({ accessToken, name }) {
     <div className="">
       {/* Desktop Navigation */}
 
-      <div className="hidden lg:block relative h-screen overflow-y-hidden w-64 bg-gray-50 transition-transform transform translate-x-0 transition duration-300 flex flex-col">
+      <div className="hidden lg:block relative h-screen overflow-hidden w-64 bg-gray-50 transition-transform transform translate-x-0 transition duration-300 flex flex-col">
         <div className="">
           <div className="flex items-center justify-between h-12 px-4 border-gray-200 hover:bg-gray-100 border-b">
             <div className="flex items-center ">
@@ -293,7 +293,7 @@ function Navbar({ accessToken, name }) {
           />
         </div>
 
-        <div className="flex-grow overflow-y-auto">
+        <div className="overflow-hidden flex flex-col">
           <div className="flex justify-center align-middle px-5 pt-4 pb-3">
             <button
               className="transition-all bg-gray-200 duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-200 hover:ring-2 active:ring-0 w-full"
@@ -306,7 +306,7 @@ function Navbar({ accessToken, name }) {
             
           </div>
           <div className="text-sm text-gray-600 pl-5 pt-2">Recent history</div>
-          <div>
+          <div className="overflow-y-auto flex-grow">
             <ul>
               {chatList.map((chat) => (
                 <li key={chat.chat_id} onClick={() => handleChatClick(chat.chat_id)}>
