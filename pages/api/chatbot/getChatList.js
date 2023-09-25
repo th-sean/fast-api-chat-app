@@ -13,10 +13,10 @@ export default async function handler(req, res) {
         },
       }
     );
-    const chatList = response.data.chatbots;
-    rres
+    const chatList = response.data;
+    res
       .status(200)
-      .json({ message: "Successfully loaded - chatList", chatList });
+      .json(chatList);
   } catch (error) {
     res.status(500).json({
       message: "Failed to load messages",

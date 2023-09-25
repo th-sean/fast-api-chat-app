@@ -12,6 +12,8 @@ import {
   PiUploadDuotone,
   PiChatTeardropTextDuotone,
   PiUserCircleDuotone,
+  PiChatDuotone,
+  
 } from "react-icons/pi";
 
 import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
@@ -21,6 +23,7 @@ import useAccountInfoStore from "../stores/store.js";
 import axios from "axios";
 import { useRouter } from "next/router";
 import firstLetterCapitalized from "../utils/stringManimupaltion.js";
+import useChatInfoStore from "../stores/chatStore.js";
 
 const tabs = [
   {
@@ -105,7 +108,9 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken") || ""}`,
+            Authorization: `Bearer ${
+              sessionStorage.getItem("accessToken") || ""
+            }`,
           },
           onUploadProgress: (progressEvent) => {
             setUploadProgress(progressEvent);
@@ -117,7 +122,6 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
       if (response.status === 200) {
         setUploadStatus("completed");
         console.log("upload completed");
-        
       }
     } catch (error) {
       console.error("Error uploading:", error);
@@ -125,10 +129,9 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
 
       const errorMessage =
         error.response?.data?.message || "Failed to upload. Please try again.";
-        setUploadStatus(errorMessage);
+      setUploadStatus(errorMessage);
 
       setUploadProgress(-1);
-      
     }
   }
 
@@ -201,18 +204,14 @@ function Navbar({ accessToken, name }) {
   const router = useRouter(); // Get the router object
   const [nameString, setNameString] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  // const loadedUsername = useAccountInfoStore((state) => state.username) || "";
+  const [chatList, setChatList] = useState([]);
+  const currentChatId = useChatInfoStore((state) => state.currentChatId);
+  const setCurrentChatId = useChatInfoStore((state) => state.setCurrentChatId);
 
   useEffect(() => {
     setToken(accessToken);
+    getChatList();
     console.log("this is name " + nameString);
-    // if (loadedUsername.length < 1) {
-    //   console.log("No username loaded yet: " + loadedUsername);
-
-    // } else {
-    //   console.log("Loaded username: " + loadedUsername);
-    //   setName(loadedUsername)
-    // }
     const currentTabIndex = tabs.findIndex(
       (tab) => tab.link === router.pathname
     );
@@ -220,6 +219,51 @@ function Navbar({ accessToken, name }) {
       setSelectedTabIndex(currentTabIndex);
     }
   }, [token, router.pathname]);
+
+  async function getChatList() {
+    try {
+      console.log("Function :getChatList");
+      const response = await axios.get("/api/chatbot/getChatList", {
+        headers: {
+          Authorization: `Bearer ${
+            sessionStorage.getItem("accessToken") || ""
+          }`,
+        },
+      });
+      console.log("chatlist response :", response.data);
+      setChatList(response.data);
+    } catch (error) {
+      console.error("Error getting new chat ID", error);
+    }
+  }
+
+  async function getNewChatId() {
+    try {
+      console.log("Function : getNewChatId ");
+      const response = await axios.get("/api/chatbot/getNewChatId", {
+        headers: {
+          Authorization: `Bearer ${
+            sessionStorage.getItem("accessToken") || ""
+          }`,
+        },
+      });
+      const chatId = response.data.chat_id;
+      await setCurrentChatId(chatId);
+      return chatId;
+    } catch (error) {
+      console.error("Error getting new chat ID", error);
+      return -1;
+    }
+  }
+
+  async function handleNewConversation() {
+    const newChatId = await getNewChatId();
+    await getChatList();
+  }
+
+  function handleChatClick(id) {
+    console.log("Chat id Clicked: ", id);
+  }
 
   return (
     <div className="">
@@ -250,14 +294,32 @@ function Navbar({ accessToken, name }) {
         </div>
 
         <div className="flex-grow overflow-y-auto">
-          <div className="text-sm text-gray-600 pl-5 pt-2">Chat</div>
           <div className="flex justify-center align-middle px-5 pt-4 pb-3">
             <button
-              className="transition-all duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-600 hover:ring-2 active:ring-0 w-full"
+              className="transition-all bg-gray-200 duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-200 hover:ring-2 active:ring-0 w-full"
               onClick={() => {}}
             >
-              <Link href={"/chatbot"}>New Conversation</Link>
+              <div onClick={handleNewConversation}>
+                New Conversation
+              </div>
             </button>
+            
+          </div>
+          <div className="text-sm text-gray-600 pl-5 pt-2">Recent history</div>
+          <div>
+            <ul>
+              {chatList.map((chat) => (
+                <li key={chat.chat_id} onClick={() => handleChatClick(chat.chat_id)}>
+                  <Link
+                    href={`/chatbot/`}
+                    className=" mx-4 flex py-2 items-center justify-center align-center rounded hover:bg-gray-100 font-medium transition duration-300"
+                  >
+                    <PiChatDuotone className="text-regular" />
+                    <div className="w-full text-sm">{chat.subject}</div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

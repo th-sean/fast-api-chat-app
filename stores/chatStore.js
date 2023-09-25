@@ -3,6 +3,7 @@ import create from "zustand";
 const useChatInfoStore = create((set) => ({
   summarizeId: -1,
   chatArray: [],
+  currentChatId :-1,
 
   // Set the entire array
   setChatArray: (newArray) => set({ chatArray: newArray }),
@@ -18,6 +19,7 @@ const useChatInfoStore = create((set) => ({
     return { chatArray: newChatArray };
   }),
   setSummarizeId: (newInt) => set({ summarizeId: newInt }),
+  setCurrentChatId: (newInt) => set({ currentChatId: newInt }),
 }));
 
 export default useChatInfoStore;

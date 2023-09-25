@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function handler(req, res) {
   const token = req.headers.authorization.split(" ")[1];
-
+  console.log("hi this is from post create new chat")
   try {
     const response = await axios.get(`http://54.193.180.218:8000/create_chat`, {
       headers: {
@@ -11,10 +11,8 @@ export default async function handler(req, res) {
       },
     });
 
-    res.status(200).json({ message: `New Chat_id:${response.data.chat_id}` });
+    res.status(200).json({ chat_id: response.data.chat_id });
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to create new chat",
-    });
+    res.status(500).json({ chat_id: -1 });
   }
 }
