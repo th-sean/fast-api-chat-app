@@ -36,16 +36,20 @@ function LoginPage() {
       console.log("getprofile here");
       //load profile
       await getProfile(accessToken);
-
       //create new chat id and set
       await setNewChatId(accessToken);
+      console.log("move to login page")
       window.location.href = "/chatbot";
+      console.log("move finished")
     } catch (error) {
       // setMessage(error.response.data.message);
     }
   };
 
   async function setNewChatId(accessToken) {
+    try{
+
+    
     const setCurrentChatId = useChatInfoStore(
       (state) => state.setCurrentChatId
     );
@@ -57,6 +61,10 @@ function LoginPage() {
     const chatId = response.data.chat_id;
     console.log("this is new chatid" + chatId);
     setCurrentChatId(chatId);
+    window.location.href = "/chatbot";
+  } catch (error){
+
+  }
   }
 
   async function getProfile(accessToken) {

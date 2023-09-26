@@ -13,7 +13,7 @@ import {
   PiChatTeardropTextDuotone,
   PiUserCircleDuotone,
   PiChatDuotone,
-  
+  PiTrashDuotone
 } from "react-icons/pi";
 
 import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
@@ -205,6 +205,7 @@ function Navbar({ accessToken, name }) {
   const [nameString, setNameString] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [chatList, setChatList] = useState([]);
+  const [selectedChatId, setSelectedChatId] = useState(null);
   const currentChatId = useChatInfoStore((state) => state.currentChatId);
   const setCurrentChatId = useChatInfoStore((state) => state.setCurrentChatId);
 
@@ -256,6 +257,25 @@ function Navbar({ accessToken, name }) {
     }
   }
 
+  async function postDeleteChat(id) {
+    try {
+      console.log("Function : getNewChatId ", id);
+      const response = await axios.post("/api/chatbot/postDeleteChat",{ chat_id: id }, {
+        headers: {
+          Authorization: `Bearer ${
+            sessionStorage.getItem("accessToken") || ""
+          }`,
+          
+        },
+      });
+      
+      
+    } catch (error) {
+      console.error("Error getting new chat ID", error);
+      return -1;
+    }
+  }
+
   async function handleNewConversation() {
     const newChatId = await getNewChatId();
     await getChatList();
@@ -263,6 +283,7 @@ function Navbar({ accessToken, name }) {
 
   function handleChatClick(id) {
     console.log("Chat id Clicked: ", id);
+    setSelectedChatId(id)
   }
 
   return (
@@ -299,23 +320,25 @@ function Navbar({ accessToken, name }) {
               className="transition-all bg-gray-200 duration-200 relative font-semibold  outline-none hover:outline-none focus:outline-none rounded-md px-3 py-1.5 text-sm border-gray-600 text-gray-500 ring-0 ring-gray-200 hover:ring-2 active:ring-0 w-full"
               onClick={() => {}}
             >
-              <div onClick={handleNewConversation}>
-                New Conversation
-              </div>
+              <div onClick={handleNewConversation}>New Conversation</div>
             </button>
-            
           </div>
-          <div className="text-sm text-gray-600 pl-5 pt-2">Recent history</div>
+          <div className="text-sm text-gray-600 pl-5 pt-2 font-medium mb-2">Recent history</div>
           <div className="overflow-y-auto flex-grow">
             <ul>
               {chatList.map((chat) => (
-                <li key={chat.chat_id} onClick={() => handleChatClick(chat.chat_id)}>
+                <li
+                  key={chat.chat_id}
+                  onClick={() => handleChatClick(chat.chat_id)}
+                  className={selectedChatId === chat.chat_id ? "font-bold" : ""}
+                >
                   <Link
-                    href={`/chatbot/`}
+                    href={`/chatbot`}
                     className=" mx-4 flex py-2 items-center justify-center align-center rounded hover:bg-gray-100 font-medium transition duration-300"
                   >
                     <PiChatDuotone className="text-regular" />
-                    <div className="w-full text-sm">{chat.subject}</div>
+                    <div className="w-full text-sm ml-2 font-normal">{chat.subject}</div>
+                    {selectedChatId === chat.chat_id && <PiTrashDuotone onClick={()=>postDeleteChat(chat.chat_id)}/>}
                   </Link>
                 </li>
               ))}
