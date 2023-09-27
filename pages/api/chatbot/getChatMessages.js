@@ -15,8 +15,9 @@ export default async function handler(req, res) {
         },
       }
     );
-    res.status(200).json({ message: response.data.message });
-    
+    console.log("API ROUTE: Chat messages",response.data)
+    res.status(200).json({ messages: response.data });
+
   } catch (error) {
     res.status(500).json({
       message: "Failed to load messages",

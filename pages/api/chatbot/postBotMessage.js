@@ -2,6 +2,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 export default async function handler(req, res) {
+  console.log("postBotMessage API received a request");
   const token = req.headers.authorization.split(" ")[1];
   if (req.method !== 'POST') {
     return res.status(405).end();
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
       }
       ,timeout: 180000
     });
-    console.log("this is message" + response.data)
+    console.log("this is message" , response.data)
     if (response.status === 200) {
       
       const botTime = moment().format("h:mm");

@@ -56,7 +56,7 @@ function Controller() {
       chat_id: chatId,
       message: inputText,
     };
-    console.log("Input Message : ", data);
+    console.log('About to make Axios call');
     try {
       const response = await axios.post("/api/chatbot/postBotMessage", data, {
         headers: {
@@ -64,7 +64,7 @@ function Controller() {
         },
         timeout: 180000,
       });
-
+      console.log('Axios call completed');
       popChatArray();
 
       if (response.status === 200) {
@@ -187,7 +187,6 @@ function Controller() {
         inputText={inputText}
         isLoading={isLoading}
         messages={chatArray}
-        setIsSideBarOpen={setIsSideBarOpen}
         setInputText={setInputText}
         handleClick={handleClick}
         handleRefresh={handleRefresh}

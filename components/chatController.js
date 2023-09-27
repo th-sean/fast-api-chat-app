@@ -101,10 +101,6 @@ function ChatController({
                 let displayFileName = "Not Available";
 
                 if (item.sender === "bot") {
-                  console.log(
-                    "this is chatcontroller and here is displayMessage " +
-                      displayMessage
-                  );
                   displayMessage = item.message.message;
                   displayFileId = item.message.file_id;
                   displayFileName = item.message.file_name || "Not Available";
