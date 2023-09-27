@@ -35,8 +35,9 @@ function Controller() {
 
   const handleClick = async () => {
     setIsLoading(true);
-    if (currentChatId === -1) {
-      setNewChatId();
+    let chatId = currentChatId;
+    if (!chatId) {
+      chatId = await setNewChatId();
     }
 
     const sendTime = moment().format("h:mm");
@@ -52,7 +53,7 @@ function Controller() {
     setInputText("");
 
     const data = {
-      chat_id: currentChatId,
+      chat_id: chatId,
       message: inputText,
     };
     console.log("Input Message : ", data);
@@ -113,7 +114,7 @@ function Controller() {
         },
       });
       const chatId = response.data.chat_id;
-
+      sessionStorage.setItem("current_chatId",chatId );
       setCurrentChatId(chatId);
 
       return chatId;
