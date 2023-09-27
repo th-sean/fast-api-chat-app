@@ -17,6 +17,7 @@ import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
 import useChatInfoStore from "../../stores/chatStore";
 import withLayout from "../../components/layouts/withLayout";
+import formatDate from "../../utils/dateFormat"
 
 function UploadPage({ accessToken }) {
   const [filesUpload, setFilesUpload] = useState([]);
@@ -316,7 +317,7 @@ function UploadPage({ accessToken }) {
                       <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">
                         {item.file_name}
                       </td>
-                      <td className="">-</td>
+                      <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">{formatDate(item.upload_time)}</td>
                       <td className="py-3 px-4 flex space-x-4">
                         <div className="flex"></div>
                         <button

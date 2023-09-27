@@ -1,4 +1,4 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import FileController from "./fileController.js";
 import ChatController from "./chatController.js";
 import moment from "moment";
@@ -17,23 +17,28 @@ function Controller() {
   const setChatArray = useChatInfoStore((state) => state.setChatArray);
   const addChatArray = useChatInfoStore((state) => state.addChatArray);
   const popChatArray = useChatInfoStore((state) => state.popChatArray);
-
+  const currentChatId = useChatInfoStore((state) => state.currentChatId);
+  const setCurrentChatId = useChatInfoStore((state) => state.setCurrentChatId);
   const summarizeId = useChatInfoStore((state) => state.summarizeId);
   const setSummarizeId = useChatInfoStore((state) => state.setSummarizeId);
 
   const isApiCallInProgress = useRef(false);
 
   useEffect(() => {
-   if (!isApiCallInProgress.current) {
-       isApiCallInProgress.current = true;
-       fetchSummary(summarizeId).then(() => {
-           isApiCallInProgress.current = false;
-       });
-   }
+    if (!isApiCallInProgress.current) {
+      isApiCallInProgress.current = true;
+      fetchSummary(summarizeId).then(() => {
+        isApiCallInProgress.current = false;
+      });
+    }
   }, [summarizeId]);
 
   const handleClick = async () => {
     setIsLoading(true);
+    if (currentChatId === -1) {
+      setNewChatId();
+    }
+
     const sendTime = moment().format("h:mm");
     const myMessage = { sender: "me", message: inputText, time: sendTime };
     const botLoadingMessage = {
@@ -47,18 +52,19 @@ function Controller() {
     setInputText("");
 
     const data = {
+      chat_id: currentChatId,
       message: inputText,
     };
-
+    console.log("Input Message : ", data);
     try {
       const response = await axios.post("/api/chatbot/postBotMessage", data, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
         },
-        timeout: 180000
+        timeout: 180000,
       });
 
-      popChatArray(); 
+      popChatArray();
 
       if (response.status === 200) {
         const botMessage = response.data;
@@ -70,38 +76,64 @@ function Controller() {
         window.alert(response.data.detail);
       }
     } catch (error) {
-      popChatArray(); 
-      if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
-          const timeoutMessage = {
-              sender: "bot",
-              message: { message: "The request took too long! Please try again later." },
-              time: sendTime,
-          };
-          addChatArray(timeoutMessage);
+      popChatArray();
+      if (
+        error.code === "ECONNABORTED" &&
+        error.message.indexOf("timeout") !== -1
+      ) {
+        const timeoutMessage = {
+          sender: "bot",
+          message: {
+            message: "The request took too long! Please try again later.",
+          },
+          time: sendTime,
+        };
+        addChatArray(timeoutMessage);
       } else {
-          const errorMessage = {
-              sender: "bot",
-              message: { message: error.message },
-              time: sendTime,
-          };
-          addChatArray(errorMessage);
+        const errorMessage = {
+          sender: "bot",
+          message: { message: error.message },
+          time: sendTime,
+        };
+        addChatArray(errorMessage);
       }
       console.error(error);
-  }
+    }
     setIsLoading(false);
   };
+
+  async function setNewChatId() {
+    try {
+      console.log("chatid Not found running setNewChatId");
+      const response = await axios.get("/api/chatbot/postCreateNewChat", {
+        headers: {
+          Authorization: `Bearer ${
+            sessionStorage.getItem("accessToken") || ""
+          }`,
+        },
+      });
+      const chatId = response.data.chat_id;
+
+      setCurrentChatId(chatId);
+
+      return chatId;
+    } catch (error) {
+      console.error("Error getting new chat ID", error);
+      return -1;
+    }
+  }
 
   const fetchSummary = async (id) => {
     const selectedId = id;
     setIsLoading(true);
     const sendTime = moment().format("h:mm");
-    
+
     const botLoadingMessage = {
       sender: "bot-loading",
       message: "",
       time: sendTime,
     };
-    
+
     addChatArray(botLoadingMessage);
 
     try {

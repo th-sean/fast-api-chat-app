@@ -3,7 +3,7 @@ import moment from "moment";
 
 export default async function handler(req, res) {
   const token = req.headers.authorization.split(" ")[1];
-
+  
   const { chat_id } = req.body;
   console.log("chatid post deleteChat", chat_id);
   try {

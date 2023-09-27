@@ -208,10 +208,15 @@ function Navbar({ accessToken, name }) {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const currentChatId = useChatInfoStore((state) => state.currentChatId);
   const setCurrentChatId = useChatInfoStore((state) => state.setCurrentChatId);
-
+  
   useEffect(() => {
+    //Access Token
     setToken(accessToken);
+    //From login page
+    setCurrentChatId(sessionStorage.getItem("currentChatId"))
+    //Load Chatlist
     getChatList();
+
     console.log("this is name " + nameString);
     const currentTabIndex = tabs.findIndex(
       (tab) => tab.link === router.pathname
@@ -241,7 +246,7 @@ function Navbar({ accessToken, name }) {
   async function getNewChatId() {
     try {
       console.log("Function : getNewChatId ");
-      const response = await axios.get("/api/chatbot/getNewChatId", {
+      const response = await axios.get("/api/chatbot/postCreateNewChat", {
         headers: {
           Authorization: `Bearer ${
             sessionStorage.getItem("accessToken") || ""
@@ -269,7 +274,7 @@ function Navbar({ accessToken, name }) {
         },
       });
       
-      
+      await getChatList()
     } catch (error) {
       console.error("Error getting new chat ID", error);
       return -1;
@@ -278,6 +283,7 @@ function Navbar({ accessToken, name }) {
 
   async function handleNewConversation() {
     const newChatId = await getNewChatId();
+    console.log("New ChatId conversation: ", newChatId)
     await getChatList();
   }
 
@@ -293,7 +299,7 @@ function Navbar({ accessToken, name }) {
       <div className="hidden lg:block relative h-screen overflow-hidden w-64 bg-gray-50 transition-transform transform translate-x-0 transition duration-300 flex flex-col">
         <div className="">
           <div className="flex items-center justify-between h-12 px-4 border-gray-200 hover:bg-gray-100 border-b">
-            <div className="flex items-center ">
+            <div className="flex items-center " onClick={()=> console.log(currentChatId)}>
               <div className="bg-green-800 text-xs w-6 h-6 aspect-1 rounded-full font-bold text-white flex items-center justify-center">
                 {firstLetterCapitalized(name)}
               </div>
@@ -330,11 +336,11 @@ function Navbar({ accessToken, name }) {
                 <li
                   key={chat.chat_id}
                   onClick={() => handleChatClick(chat.chat_id)}
-                  className={selectedChatId === chat.chat_id ? "font-bold" : ""}
+                  className={selectedChatId === chat.chat_id ? "text-blue-800" : ""}
                 >
                   <Link
                     href={`/chatbot`}
-                    className=" mx-4 flex py-2 items-center justify-center align-center rounded hover:bg-gray-100 font-medium transition duration-300"
+                    className="mx-4 flex py-2 px-2 items-center justify-center align-center rounded hover:bg-gray-100 transition duration-300"
                   >
                     <PiChatDuotone className="text-regular" />
                     <div className="w-full text-sm ml-2 font-normal">{chat.subject}</div>

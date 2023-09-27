@@ -5,11 +5,10 @@ import useAccountInfoStore from "../../stores/store";
 import withLayout from "../../components/layouts/withLayout";
 import LottieAnimation from "../../components/animation/lottie-animation";
 import animationData from "../../public/accounting-lottie.json";
-import useChatInfoStore from "../../stores/chatStore";
+
 
 function LoginPage() {
   const [message, setMessage] = useState("");
-  const setUsername = useAccountInfoStore((state) => state.setUsername);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,9 +24,6 @@ function LoginPage() {
         password: password,
       });
 
-      console.log(
-        "successfully retrive the access token to login.js" + response.data
-      );
       //set Login Sucess Message
       setMessage(response.data.message);
       //set access token on session storage
@@ -37,35 +33,13 @@ function LoginPage() {
       //load profile
       await getProfile(accessToken);
       //create new chat id and set
-      await setNewChatId(accessToken);
-      console.log("move to login page")
+      console.log("move to login page" );
       window.location.href = "/chatbot";
-      console.log("move finished")
+      console.log("move finished" +chatid);
     } catch (error) {
       // setMessage(error.response.data.message);
     }
   };
-
-  async function setNewChatId(accessToken) {
-    try{
-
-    
-    const setCurrentChatId = useChatInfoStore(
-      (state) => state.setCurrentChatId
-    );
-    const response = await axios.get("/api/chatbot/postCreateNewChat", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    const chatId = response.data.chat_id;
-    console.log("this is new chatid" + chatId);
-    setCurrentChatId(chatId);
-    window.location.href = "/chatbot";
-  } catch (error){
-
-  }
-  }
 
   async function getProfile(accessToken) {
     const response = await axios.get("/api/getProfile", {
