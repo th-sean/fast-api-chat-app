@@ -15,8 +15,8 @@ export default function formatDate(uploadTimeStr) {
       uploadTime.getMonth() === now.getMonth() &&
       uploadTime.getFullYear() === now.getFullYear()
     ) {
-      return uploadTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return uploadTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit',hour12: true, });
     }
   
-    return uploadTime.toLocaleDateString([], { month: '2-digit', day: '2-digit' });
+    return uploadTime.toLocaleDateString([], { month: '2-digit', day: '2-digit',year: '2-digit' });
   }

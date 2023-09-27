@@ -299,8 +299,10 @@ function Navbar({ accessToken, name }) {
           },
         }
       );
+
       const messages = response.data.messages.split("\n");
 
+      if (messages.length > 1) {
       messages.forEach((message, index) => {
         const isHuman = message.startsWith('human:');
         const messageContent = message.split(': ')[1]; // Extracting message content after ':'
@@ -314,6 +316,7 @@ function Navbar({ accessToken, name }) {
         addChatArray(messageObject)
       });
       console.log("Chat History restored", messages)
+    }
 
       await getChatList();
     } catch (error) {

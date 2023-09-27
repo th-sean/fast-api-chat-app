@@ -56,6 +56,7 @@ function Controller() {
       chat_id: chatId,
       message: inputText,
     };
+    
     console.log('About to make Axios call');
     try {
       const response = await axios.post("/api/chatbot/postBotMessage", data, {

@@ -15,7 +15,6 @@ export default async function handler(req, res) {
         },
       }
     );
-    console.log("API ROUTE: Chat messages",response.data)
     res.status(200).json({ messages: response.data });
 
   } catch (error) {
