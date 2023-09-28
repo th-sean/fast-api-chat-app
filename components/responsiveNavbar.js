@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import moment from "moment";
 import {
   AiOutlineMenu,
   AiOutlineClose,
@@ -18,6 +19,7 @@ import {
 
 import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
 import { BsChat } from "react-icons/bs";
+import ChatComponent from "./upload/chatList.js";
 import Image from "next/image";
 import useAccountInfoStore from "../stores/store.js";
 import axios from "axios";
@@ -229,6 +231,27 @@ function Navbar({ accessToken, name }) {
     }
   }, [token, router.pathname]);
 
+  const groupedChats = useMemo(() => {
+    const today = [];
+    const yesterday = [];
+    const last7Days = [];
+    const last30Days = [];
+  
+    const now = moment();
+  
+    chatList.forEach(chat => {
+      const chatTime = moment(chat.last_chat_time);
+      const diffDays = now.diff(chatTime, 'days');
+  
+      if (diffDays === 0) today.push(chat);
+      else if (diffDays === 1) yesterday.push(chat);
+      else if (diffDays < 7) last7Days.push(chat);
+      else if (diffDays < 30) last30Days.push(chat);
+    });
+  
+    return { today, yesterday, last7Days, last30Days };
+  }, [chatList]);
+
   async function getChatList() {
     try {
       console.log("Function :getChatList");
@@ -401,10 +424,58 @@ function Navbar({ accessToken, name }) {
             </button>
           </div>
           <div className="text-sm text-gray-600 pl-5 pt-2 font-medium mb-2">
-            Recent history
+            Chat history
           </div>
           <div className="overflow-y-auto flex-grow">
-            <ul>
+      {[{ label: 'Today', chats: groupedChats.today },
+        { label: 'Yesterday', chats: groupedChats.yesterday },
+        { label: 'Previous 7 Days', chats: groupedChats.last7Days },
+        { label: 'Previous 30 Days', chats: groupedChats.last30Days }]
+        .map(section => (
+          section.chats.length > 0 && (
+            <div className="text-sm text-gray-600 pl-5 pt-2 font-medium mb-2" key={section.label}>
+              <h2>{section.label}</h2>
+              <ul>
+                {section.chats.map(chat => (
+                  <li
+                  key={chat.chat_id}
+                  onClick={() => handleChatClick(chat.chat_id)}
+                  className={
+                    selectedChatId === chat.chat_id ? "text-blue-800" : ""
+                  }
+                >
+                  <Link
+                    href={`/chatbot`}
+                    className=" flex py-2 px-2 mr-4 items-center justify-center align-center rounded hover:bg-gray-100 transition duration-300"
+                  >
+                    <PiChatDuotone className="" />
+
+                    {selectedChatId === chat.chat_id ? (
+                      <div className="w-full text-sm ml-2 font-normal">
+                        {chat.subject}
+                      </div>
+                    ) : (
+                      <div className="w-full text-sm ml-2 font-normal truncate">
+                        {chat.subject}
+                      </div>
+                    )}
+
+                    {selectedChatId === chat.chat_id && (
+                      <PiTrashDuotone
+                        onClick={() => postDeleteChat(chat.chat_id)}
+                        className="ml-2"
+                      />
+                    )}
+                  </Link>
+                </li>
+                ))}
+              </ul>
+            </div>
+          )
+        ))}
+    </div>
+            
+            {/* <ul>
               {chatList.map((chat) => (
                 <li
                   key={chat.chat_id}
@@ -438,8 +509,8 @@ function Navbar({ accessToken, name }) {
                   </Link>
                 </li>
               ))}
-            </ul>
-          </div>
+            </ul> */}
+         
         </div>
       </div>
 

@@ -99,19 +99,16 @@ function UploadPage({ accessToken }) {
         }
       );
 
-      if (response.status === 200) {
+     
         setUploadStatus("completed");
         console.log("upload completed");
         fetchUploadedDocuments(accessToken);
-      }
+      
     } catch (error) {
       console.error("Error uploading:", error);
       setUploadStatus("failed");
-
-      const errorMessage =
-        error.response?.data?.message || "Failed to upload. Please try again.";
+      const errorMessage = "Failed to upload";
       setUploadMessage(errorMessage);
-
       setUploadProgress(-1);
       fetchUploadedDocuments(accessToken);
     }

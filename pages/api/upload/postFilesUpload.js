@@ -35,20 +35,20 @@ async function handler(req, res) {
 
           let errorMessage;
 
-          if (error.response?.data?.detail) {
-              // Check specific error messages
-              if (error.response.data.detail.includes("FileType.UNK file type is not supported")) {
-                  errorMessage = "Unsupported file type.";
-              } else if (error.response.data.detail.includes("File name conflict")) {
-                  errorMessage = "Same file found.";
-              } else {
-                  errorMessage = error.response.data.detail;
-              }
-          } else {
-              errorMessage = "Failed to upload";
-          }
+        //   if (error.response?.data?.detail) {
+        //       // Check specific error messages
+        //       if (error.response.data.detail.includes("FileType.UNK file type is not supported")) {
+        //           errorMessage = "Unsupported file type.";
+        //       } else if (error.response.data.detail.includes("File name conflict")) {
+        //           errorMessage = "Same file found.";
+        //       } else {
+        //           errorMessage = error.response.data.detail;
+        //       }
+        //   } else {
+        //       errorMessage = "Failed to upload";
+        //   }
 
-          res.status(error.response?.status || 500).json({
+          res.status(500).json({
               message: errorMessage,
               success: false
           });
