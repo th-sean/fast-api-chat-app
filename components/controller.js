@@ -68,6 +68,10 @@ function Controller() {
       console.log('Axios call completed');
       popChatArray();
 
+      console.log("title update is updating")
+      
+
+      console.log("title update is finsihed")
       if (response.status === 200) {
         const botMessage = response.data;
         console.log("this is bot controller " + botMessage);
@@ -77,6 +81,7 @@ function Controller() {
       } else if (response.status === 400) {
         window.alert(response.data.detail);
       }
+      await getChatTitle(chatId)
     } catch (error) {
       popChatArray();
       if (
@@ -101,6 +106,8 @@ function Controller() {
       }
       console.error(error);
     }
+    
+    
     setIsLoading(false);
   };
 
@@ -121,7 +128,28 @@ function Controller() {
       return chatId;
     } catch (error) {
       console.error("Error getting new chat ID", error);
-      return -1;
+      return 
+    }
+  }
+
+  async function getChatTitle(id) {
+    try {
+      console.log("Function : UpdateChatTitle ");
+      const response = await axios.post(
+        "/api/chatbot/getChatTitle",
+        { chat_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              sessionStorage.getItem("accessToken") || ""
+            }`,
+          },
+        }
+      );
+      console.log("Function : UpdateChatTitle -> success");
+      //refresh chat list should be implemented
+    } catch (error) {
+      console.error("Function : UpdateChatTitle -> failed", error);
     }
   }
 

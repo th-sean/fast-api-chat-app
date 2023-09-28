@@ -19,7 +19,8 @@ async function handler(req, res) {
               "accept": "application/json",
               "Authorization": `Bearer ${token}`,  // Set the authorization header
               "Content-Type": req.headers["content-type"]
-          },
+          }
+          ,timeout: 180000
       };
 
       try {

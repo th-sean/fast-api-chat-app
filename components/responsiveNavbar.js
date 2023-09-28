@@ -120,7 +120,7 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
       );
 
       if (response.status === 200) {
-        setUploadStatus("completed");
+        setUploadStatus("Completed");
         console.log("upload completed");
       }
     } catch (error) {
@@ -181,7 +181,9 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
             <div className="flex-start">{uploadStatus}</div>
             <button
               className="transition-all duration-200 relative font-medium shadow-sm outline-none hover:outline-none focus:outline-none rounded-lg px-4 py-2 text-base bg-white text-gray-600 ring-1 ring-gray-200 hover:ring-2 active:ring-1"
-              onClick={() => setShowCreateModal(false)}
+              onClick={() => {
+                setShowCreateModal(false), setUploadStatus("");
+              }}
             >
               <span className="flex items-center justify-center mx-auto space-x-2 select-none font-semibold">
                 Cancel
@@ -303,25 +305,45 @@ function Navbar({ accessToken, name }) {
       const messages = response.data.messages.split("\n");
 
       if (messages.length > 1) {
-      messages.forEach((message, index) => {
-        const isHuman = message.startsWith('human:');
-        const messageContent = message.split(': ')[1]; // Extracting message content after ':'
-        
-        const messageObject = {
-          sender: isHuman ? 'me' : 'bot',
-          message: isHuman ? messageContent : { message: messageContent },
-          time: '', // You can fill in the time based on your requirement
-        };
-        
-        addChatArray(messageObject)
-      });
-      console.log("Chat History restored", messages)
-    }
+        messages.forEach((message, index) => {
+          const isHuman = message.startsWith("human:");
+          const messageContent = message.split(": ")[1]; // Extracting message content after ':'
+
+          const messageObject = {
+            sender: isHuman ? "me" : "bot",
+            message: isHuman ? messageContent : { message: messageContent },
+            time: "", // You can fill in the time based on your requirement
+          };
+
+          addChatArray(messageObject);
+        });
+        console.log("Chat History restored", messages);
+      }
 
       await getChatList();
     } catch (error) {
       console.error("Error getting new chat ID", error);
       return -1;
+    }
+  }
+
+  async function getChatTitle(id) {
+    try {
+      console.log("Function : UpdateChatTitle ");
+      const response = await axios.get(
+        "/api/chatbot/getChatTitle",
+        { chat_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              sessionStorage.getItem("accessToken") || ""
+            }`,
+          },
+        }
+      );
+      //refresh
+    } catch (error) {
+      console.error("Error getting new chat ID", error);
     }
   }
 
@@ -394,15 +416,24 @@ function Navbar({ accessToken, name }) {
                 >
                   <Link
                     href={`/chatbot`}
-                    className="mx-4 flex py-2 px-2 items-center justify-center align-center rounded hover:bg-gray-100 transition duration-300"
+                    className="mx-4 flex py-2 px-2 justify-center align-center rounded hover:bg-gray-100 transition duration-300"
                   >
                     <PiChatDuotone className="text-regular" />
-                    <div className="w-full text-sm ml-2 font-normal">
-                      {chat.subject}
-                    </div>
+
+                    {selectedChatId === chat.chat_id ? (
+                      <div className="w-full text-sm ml-2 font-normal">
+                        {chat.subject}
+                      </div>
+                    ) : (
+                      <div className="w-full text-sm ml-2 font-normal truncate">
+                        {chat.subject}
+                      </div>
+                    )}
+
                     {selectedChatId === chat.chat_id && (
                       <PiTrashDuotone
                         onClick={() => postDeleteChat(chat.chat_id)}
+                        className="ml-2"
                       />
                     )}
                   </Link>
