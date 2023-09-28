@@ -96,10 +96,10 @@ function UploadPage({ accessToken }) {
             setUploadProgress(progressEvent);
             console.log(progressEvent);
           },
-          timeout: 300000,
+          timeout: 20000,
         }
       );
-
+        console.log("upload responses : this response")
       if (response.status === 200) {
         setUploadStatus("completed");
         console.log("upload completed");
@@ -107,9 +107,8 @@ function UploadPage({ accessToken }) {
       }
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to upload.";
+      error.response?.data?.message || "Failed to upload.";
       setUploadMessage(errorMessage);
-
       setUploadProgress(-1);
       fetchUploadedDocuments(accessToken);
     }
@@ -187,7 +186,6 @@ function UploadPage({ accessToken }) {
         fetchUploadedDocuments(accessToken);
         setDeleteModalOpen(false);
       } else {
-        console.log("it is not 200");
         setDeleteStatus("complete");
         fetchUploadedDocuments(accessToken);
         setDeleteModalOpen(false);
