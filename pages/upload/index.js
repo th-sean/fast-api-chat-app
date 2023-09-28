@@ -96,6 +96,7 @@ function UploadPage({ accessToken }) {
             setUploadProgress(progressEvent);
             console.log(progressEvent);
           },
+          timeout: 300000,
         }
       );
 
@@ -105,11 +106,8 @@ function UploadPage({ accessToken }) {
         fetchUploadedDocuments(accessToken);
       }
     } catch (error) {
-      console.error("Error uploading:", error);
-      setUploadStatus("failed");
-
       const errorMessage =
-        error.response?.data?.message || "Failed to upload. Please try again.";
+        error.response?.data?.message || "Failed to upload.";
       setUploadMessage(errorMessage);
 
       setUploadProgress(-1);
