@@ -96,19 +96,22 @@ function UploadPage({ accessToken }) {
             setUploadProgress(progressEvent);
             console.log(progressEvent);
           },
-          timeout: 20000,
         }
       );
-        console.log("upload responses : this response")
+
       if (response.status === 200) {
         setUploadStatus("completed");
         console.log("upload completed");
         fetchUploadedDocuments(accessToken);
       }
     } catch (error) {
+      console.error("Error uploading:", error);
+      setUploadStatus("failed");
+
       const errorMessage =
-      error.response?.data?.message || "Failed to upload.";
+        error.response?.data?.message || "Failed to upload. Please try again.";
       setUploadMessage(errorMessage);
+
       setUploadProgress(-1);
       fetchUploadedDocuments(accessToken);
     }
