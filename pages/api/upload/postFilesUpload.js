@@ -34,7 +34,7 @@ async function handler(req, res) {
           // Handle errors from the backend server
 
           let errorMessage;
-
+            console.log("this is error message: ",error.response?.data?.detail)
           if (error.response?.data?.detail) {
               // Check specific error messages
               if (error.response.data.detail.includes("FileType.UNK file type is not supported")) {

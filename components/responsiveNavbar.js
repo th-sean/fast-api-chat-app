@@ -118,7 +118,6 @@ const CreateContentModal = ({ showModal, setShowCreateModal }) => {
           },
         }
       );
-
       if (response.status === 200) {
         setUploadStatus("Completed");
         console.log("upload completed");

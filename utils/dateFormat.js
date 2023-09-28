@@ -1,10 +1,7 @@
 export default function formatDate(uploadTimeStr) {
     const uploadTime = new Date(uploadTimeStr);
     const now = new Date();
-    console.log('Upload Time:', uploadTime);
-    console.log('Current Time:', now);
     const timeDiff = (now - uploadTime) / 1000; // Difference in seconds
-    console.log('Time Difference in seconds:', timeDiff);
   
     if (timeDiff < 60) {
       return 'Just-now';
