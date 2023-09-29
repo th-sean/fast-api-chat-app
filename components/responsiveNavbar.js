@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
-import moment from "moment";
+import moment from "moment-timezone";
 import {
   AiOutlineMenu,
   AiOutlineClose,
@@ -18,10 +18,6 @@ import {
 } from "react-icons/pi";
 
 import { FaFileLines, FaGoogleDrive } from "react-icons/fa6";
-import { BsChat } from "react-icons/bs";
-import ChatComponent from "./upload/chatList.js";
-import Image from "next/image";
-import useAccountInfoStore from "../stores/store.js";
 import axios from "axios";
 import { useRouter } from "next/router";
 import firstLetterCapitalized from "../utils/stringManimupaltion.js";
@@ -236,17 +232,20 @@ function Navbar({ accessToken, name }) {
     const yesterday = [];
     const last7Days = [];
     const last30Days = [];
+    
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const now = moment().tz(userTimeZone).startOf('day');
   
-    const now = moment();
+    chatList.forEach((chat) => {
+      const chatTime = moment.utc(chat.last_chat_time).tz(userTimeZone).startOf('day');
+      const diffDays = now.diff(chatTime, "days");
   
-    chatList.forEach(chat => {
-      const chatTime = moment(chat.last_chat_time);
-      const diffDays = now.diff(chatTime, 'days');
-  
+      if (diffDays < 0) return; // Handle chats from the future appropriately
+      
       if (diffDays === 0) today.push(chat);
       else if (diffDays === 1) yesterday.push(chat);
-      else if (diffDays < 7) last7Days.push(chat);
-      else if (diffDays < 30) last30Days.push(chat);
+      else if (diffDays <= 7) last7Days.push(chat); // If you want to include 'yesterday' in 'last7Days'
+      else if (diffDays <= 30) last30Days.push(chat); // If you want to include 'last7Days' in 'last30Days'
     });
   
     return { today, yesterday, last7Days, last30Days };
@@ -427,55 +426,62 @@ function Navbar({ accessToken, name }) {
             Chat history
           </div>
           <div className="overflow-y-auto flex-grow">
-      {[{ label: 'Today', chats: groupedChats.today },
-        { label: 'Yesterday', chats: groupedChats.yesterday },
-        { label: 'Previous 7 Days', chats: groupedChats.last7Days },
-        { label: 'Previous 30 Days', chats: groupedChats.last30Days }]
-        .map(section => (
-          section.chats.length > 0 && (
-            <div className="text-sm text-gray-600 pl-5 pt-2 font-medium mb-2" key={section.label}>
-              <h2>{section.label}</h2>
-              <ul>
-                {section.chats.map(chat => (
-                  <li
-                  key={chat.chat_id}
-                  onClick={() => handleChatClick(chat.chat_id)}
-                  className={
-                    selectedChatId === chat.chat_id ? "text-blue-800" : ""
-                  }
-                >
-                  <Link
-                    href={`/chatbot`}
-                    className=" flex py-2 px-2 mr-4 items-center justify-center align-center rounded hover:bg-gray-100 transition duration-300"
+            {[
+              { label: "Today", chats: groupedChats.today },
+              { label: "Yesterday", chats: groupedChats.yesterday },
+              { label: "Previous 7 Days", chats: groupedChats.last7Days },
+              { label: "Previous 30 Days", chats: groupedChats.last30Days },
+            ].map(
+              (section) =>
+                section.chats.length > 0 && (
+                  <div
+                    className="text-sm text-gray-600 pl-5 pt-2 font-medium mb-2"
+                    key={section.label}
                   >
-                    <PiChatDuotone className="" />
+                    <h2>{section.label}</h2>
+                    <ul>
+                      {section.chats.map((chat) => (
+                        <li
+                          key={chat.chat_id}
+                          onClick={() => handleChatClick(chat.chat_id)}
+                          className={
+                            selectedChatId === chat.chat_id
+                              ? "text-blue-800"
+                              : ""
+                          }
+                        >
+                          <Link
+                            href={`/chatbot`}
+                            className=" flex py-2 px-2 mr-4 items-center justify-center align-center rounded hover:bg-gray-100 transition duration-300"
+                          >
+                            <PiChatDuotone className="" />
 
-                    {selectedChatId === chat.chat_id ? (
-                      <div className="w-full text-sm ml-2 font-normal">
-                        {chat.subject}
-                      </div>
-                    ) : (
-                      <div className="w-full text-sm ml-2 font-normal truncate">
-                        {chat.subject}
-                      </div>
-                    )}
+                            {selectedChatId === chat.chat_id ? (
+                              <div className="w-full text-sm ml-2 font-normal">
+                                {chat.subject}
+                              </div>
+                            ) : (
+                              <div className="w-full text-sm ml-2 font-normal truncate">
+                                {chat.subject}
+                              </div>
+                            )}
 
-                    {selectedChatId === chat.chat_id && (
-                      <PiTrashDuotone
-                        onClick={() => postDeleteChat(chat.chat_id)}
-                        className="ml-2"
-                      />
-                    )}
-                  </Link>
-                </li>
-                ))}
-              </ul>
-            </div>
-          )
-        ))}
-    </div>
-            
-            {/* <ul>
+                            {selectedChatId === chat.chat_id && (
+                              <PiTrashDuotone
+                                onClick={() => postDeleteChat(chat.chat_id)}
+                                className="ml-2"
+                              />
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+            )}
+          </div>
+
+          {/* <ul>
               {chatList.map((chat) => (
                 <li
                   key={chat.chat_id}
@@ -510,7 +516,6 @@ function Navbar({ accessToken, name }) {
                 </li>
               ))}
             </ul> */}
-         
         </div>
       </div>
 
