@@ -17,7 +17,7 @@ import { FaSearch } from "react-icons/fa";
 import Spinner from "../../components/animation/spinner";
 import useChatInfoStore from "../../stores/chatStore";
 import withLayout from "../../components/layouts/withLayout";
-import formatDate from "../../utils/dateFormat"
+import formatDate from "../../utils/dateFormat";
 
 function UploadPage({ accessToken }) {
   const [filesUpload, setFilesUpload] = useState([]);
@@ -34,6 +34,9 @@ function UploadPage({ accessToken }) {
   const [showUploadDropdown, setShowUploadDropdown] = useState(false);
   const dropdownUploadRef = useRef(false);
   const setSummarizeId = useChatInfoStore((state) => state.setSummarizeId);
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const router = useRouter();
 
   // const selectDocument = (fileId) => {
@@ -46,10 +49,46 @@ function UploadPage({ accessToken }) {
     setSelectedID(fileId);
     getDownloadDocument(fileId);
   };
-  const summarizeDocumentClick = (fileId) => {
+
+  async function summarizeDocumentClick(fileId, index) {
+    setSummaryLoading(true)
+    setExpandedRow(index);
     setSelectedID(fileId);
     setSummarizeId(fileId);
-    router.push("/chatbot");
+    setSummaryData("")
+    setExpandedRow(expandedRow === index ? null : index); // Toggle the expanded row
+
+    if (expandedRow !== index) {
+      const data = await getSummary(fileId); 
+      setSummaryData(data);
+    }
+    setSummaryLoading(false)
+  }
+
+  const getSummary = async (id) => {
+    const selectedId = id;
+    
+
+    try {
+      const response = await axios.post(
+        `/api/chatbot/getSummary`,
+        { selectedId: selectedId },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const summary = await response.data.message;
+      console.log("this is summary ", summary);
+      return summary;
+    } catch (err) {
+      popChatArray();
+      console.log(err);
+      return "Failed";
+    }
   };
 
   const deleteDocumentClick = (fileId) => {
@@ -99,11 +138,9 @@ function UploadPage({ accessToken }) {
         }
       );
 
-     
-        setUploadStatus("completed");
-        console.log("upload completed");
-        fetchUploadedDocuments(accessToken);
-      
+      setUploadStatus("completed");
+      console.log("upload completed");
+      fetchUploadedDocuments(accessToken);
     } catch (error) {
       console.error("Error uploading:", error);
       setUploadStatus("failed");
@@ -286,124 +323,143 @@ function UploadPage({ accessToken }) {
               <tbody className="divide-y divide-gray-200">
                 {documentList &&
                   documentList.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="">
-                        <label className="flex items-center justify-center">
-                          <input
-                            type="checkbox"
-                            className="form-checkbox h-4 w-4 text-blue-600"
-                          />
-                        </label>
-                      </td>
-                      <td className="items-center justify-center">
-                        {deleteStatus === "in-progress" &&
-                        selectedID === item.id ? (
-                          <Spinner
-                            className="mr-5"
-                            size={`w-5 h-5`}
-                            tintColor={"fill-red-600"}
-                            bgColor={"dark:text-gray-200"}
-                          />
-                        ) : (
-                          <div className="text-sm ">
-                            <PiFileTextBold />
-                          </div>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">
-                        {item.file_name}
-                      </td>
-                      <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">{formatDate(item.upload_time)}</td>
-                      <td className="py-3 px-4 flex space-x-4">
-                        <div className="flex"></div>
-                        <button
-                          onClick={() => {
-                            downloadDocumentClick(item.id);
-                          }}
-                          className="relative transform transition-transform hover:scale-105 active:scale-95"
-                        >
-                          <div className="relative group">
-                            <PiDownloadSimpleDuotone />
-
-                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                              Download
+                    <>
+                      <tr key={index} className="hover:bg-gray-100">
+                        <td className="">
+                          <label className="flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              className="form-checkbox h-4 w-4 text-blue-600"
+                            />
+                          </label>
+                        </td>
+                        <td className="items-center justify-center">
+                          {deleteStatus === "in-progress" &&
+                          selectedID === item.id ? (
+                            <Spinner
+                              className="mr-5"
+                              size={`w-5 h-5`}
+                              tintColor={"fill-red-600"}
+                              bgColor={"dark:text-gray-200"}
+                            />
+                          ) : (
+                            <div className="text-sm ">
+                              <PiFileTextBold />
                             </div>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            summarizeDocumentClick(item.id);
-                          }}
-                        >
-                          <div className="relative group">
-                            <PiQueueDuotone />
-
-                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                              Summarize
-                            </div>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            deleteDocumentClick(item.id);
-                          }}
-                        >
-                          <div className="relative group">
-                            <PiTrashDuotone />
-
-                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                              Delete
-                            </div>
-                          </div>
-
-                          <Modal
-                            className="modal"
-                            isOpen={deleteModalOpen && selectedID == item.id}
-                            onRequestClose={() => setDeleteModalOpen(false)}
-                            overlayClassName="modal-overlay"
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">
+                          {item.file_name}
+                        </td>
+                        <td className="whitespace-nowrap pr-3 py-4 text-sm text-gray-700 truncate text-ellipsis max-w-[10rem]">
+                          {formatDate(item.upload_time)}
+                        </td>
+                        <td className="py-3 px-4 flex space-x-4">
+                          <div className="flex"></div>
+                          <button
+                            onClick={() => {
+                              downloadDocumentClick(item.id);
+                            }}
+                            className="relative transform transition-transform hover:scale-105 active:scale-95"
                           >
-                            <h2 className="text-lg font-bold">
-                              Are you sure you want to delete the file?
-                            </h2>
-                            <p className="text-xs mt-5">
-                              Are you sure you want to delete{" "}
-                              <strong>{" " + item.file_name}</strong> ?
-                            </p>
-                            <div className="flex justify-end mt-5">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDeleteModalOpen(false);
-                                }}
-                                className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={deleteDocument}
-                                className="bg-red-500 text-white px-4 py-2 rounded"
-                              >
-                                {deleteStatus === "completed" ? (
-                                  "Completed"
-                                ) : deleteStatus === "in-progress" ? (
-                                  <div className="flex items-center justify-center">
-                                    <Spinner
-                                      className=""
-                                      size={`w-5 h-5`}
-                                      tintColor={"fill-white"}
-                                      bgColor={"dark:text-red-500"}
-                                    />{" "}
-                                    <div className="ml-1">Deleting</div>{" "}
-                                  </div>
-                                ) : (
-                                  "Delete"
-                                )}
-                              </button>
+                            <div className="relative group">
+                              <PiDownloadSimpleDuotone />
+
+                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                Download
+                              </div>
                             </div>
-                          </Modal>
-                        </button>
-                      </td>
-                    </tr>
+                          </button>
+                          <button
+                            onClick={() => {
+                              summarizeDocumentClick(item.id, index);
+                            }}
+                          >
+                            <div className="relative group">
+                              <PiQueueDuotone />
+
+                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                Summarize
+                              </div>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              deleteDocumentClick(item.id);
+                            }}
+                          >
+                            <div className="relative group">
+                              <PiTrashDuotone />
+
+                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                Delete
+                              </div>
+                            </div>
+
+                            <Modal
+                              className="modal"
+                              isOpen={deleteModalOpen && selectedID == item.id}
+                              onRequestClose={() => setDeleteModalOpen(false)}
+                              overlayClassName="modal-overlay"
+                            >
+                              <h2 className="text-lg font-bold">
+                                Are you sure you want to delete the file?
+                              </h2>
+                              <p className="text-xs mt-5">
+                                Are you sure you want to delete{" "}
+                                <strong>{" " + item.file_name}</strong> ?
+                              </p>
+                              <div className="flex justify-end mt-5">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteModalOpen(false);
+                                  }}
+                                  className="bg-gray-100 text-black px-4 py-2 rounded mr-2"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={deleteDocument}
+                                  className="bg-red-500 text-white px-4 py-2 rounded"
+                                >
+                                  {deleteStatus === "completed" ? (
+                                    "Completed"
+                                  ) : deleteStatus === "in-progress" ? (
+                                    <div className="flex items-center justify-center">
+                                      <Spinner
+                                        className=""
+                                        size={`w-5 h-5`}
+                                        tintColor={"fill-white"}
+                                        bgColor={"dark:text-red-500"}
+                                      />{" "}
+                                      <div className="ml-1">Deleting</div>{" "}
+                                    </div>
+                                  ) : (
+                                    "Delete"
+                                  )}
+                                </button>
+                              </div>
+                            </Modal>
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedRow === index && (
+                        <tr>
+                        <td colSpan={5} className="p-4">
+                          {summaryLoading ? (
+                            <div>Summary is loading...</div>
+                          ) : (
+                            <>
+                              <div>Summary</div>
+                              <div className={`scaleUp `}>{summaryData}</div>
+                            </>
+                            
+                          )}
+                        </td>
+                      </tr>
+                      )}
+                    </>
                   ))}
               </tbody>
             </table>

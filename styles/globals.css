@@ -32,3 +32,15 @@ body {
     justify-content: center;
     z-index: 9998; /* Z-index should be lower than modal */
   }
+
+  @keyframes slideIn {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  .scaleUp {
+    animation: scaleUp 1s ease-out;
+  }

@@ -19,7 +19,7 @@ function Controller() {
   const popChatArray = useChatInfoStore((state) => state.popChatArray);
   const currentChatId = useChatInfoStore((state) => state.currentChatId);
   const setCurrentChatId = useChatInfoStore((state) => state.setCurrentChatId);
-  const summarizeId = useChatInfoStore((state) => state.summarizeId);
+
   const setSummarizeId = useChatInfoStore((state) => state.setSummarizeId);
 
   const isApiCallInProgress = useRef(false);
@@ -27,11 +27,9 @@ function Controller() {
   useEffect(() => {
     if (!isApiCallInProgress.current) {
       isApiCallInProgress.current = true;
-      fetchSummary(summarizeId).then(() => {
-        isApiCallInProgress.current = false;
-      });
+      
     }
-  }, [summarizeId]);
+  }, []);
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -152,47 +150,6 @@ function Controller() {
       console.error("Function : UpdateChatTitle -> failed", error);
     }
   }
-
-  const fetchSummary = async (id) => {
-    const selectedId = id;
-    setIsLoading(true);
-    const sendTime = moment().format("h:mm");
-
-    const botLoadingMessage = {
-      sender: "bot-loading",
-      message: "",
-      time: sendTime,
-    };
-
-    addChatArray(botLoadingMessage);
-
-    try {
-      const response = await axios.post(
-        `/api/chatbot/getSummary`,
-        { selectedId: selectedId },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      popChatArray();
-      console.log("is this summary?");
-      if (response.status === 200) {
-        const summary = await response.data;
-        console.log("this is summary " + summary);
-        addChatArray(summary);
-      } else {
-        // handle errors like you did in the handleClick function
-      }
-    } catch (err) {
-      popChatArray();
-      console.log(err);
-    }
-    setIsLoading(false);
-    setSummarizeId(-1);
-  };
 
   const handleRefresh = async () => {
     const response = await axios.get("/api/chatbot/getClearChatHistory", {

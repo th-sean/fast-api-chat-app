@@ -13,23 +13,20 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
         });
-        console.log("can you see summary of document? "+ response.data)
-        const botTime = moment().format("h:mm");
+      
         res.status(200).json({
-            sender: "bot",
-            message: {message : response.data},
-            time: botTime
+            message : response.data,
         });
     } catch (error) {
-        const botTime = moment().format("h:mm");
+
         const errorMessage = 
             error.response && error.response.data && error.response.data.message
                 ? error.response.data.message
                 : "Not authenticated";
         res.status(500).json({
-            sender: "bot",
-            message: {message : errorMessage},
-            time: botTime
+    
+         message : errorMessage,
+           
         });
     }
 }
