@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
-import useLabelArrayStore from "../../stores/store";
 import useAccountInfoStore from "../../stores/store";
 import withLayout from "../../components/layouts/withLayout";
 import LottieAnimation from "../../components/animation/lottie-animation";
 import animationData from "../../public/accounting-lottie.json";
 
+
 function LoginPage() {
   const [message, setMessage] = useState("");
-  const setUsername = useAccountInfoStore((state) => state.setUsername);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,33 +24,34 @@ function LoginPage() {
         password: password,
       });
 
-      console.log(
-        "successfully retrive the access token to login.js" + response.data
-      );
+      //set Login Sucess Message
       setMessage(response.data.message);
-      sessionStorage.setItem("accessToken", response.data.accessToken);
+      //set access token on session storage
+      const accessToken = response.data.accessToken;
+      sessionStorage.setItem("accessToken", accessToken);
       console.log("getprofile here");
-      await getProfile();
+      //load profile
+      await getProfile(accessToken);
+      //create new chat id and set
+      console.log("move to login page" );
       window.location.href = "/chatbot";
-      
+      console.log("move finished" +chatid);
     } catch (error) {
       // setMessage(error.response.data.message);
     }
   };
 
-  async function getProfile() {
+  async function getProfile(accessToken) {
     const response = await axios.get("/api/getProfile", {
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
-      console.log("did you get username from getRPfoeil?" + username)
-      if (response.data.success) {
-        sessionStorage.setItem("name", response.data.response.username);
-        
-      } else {
-
-      }
+    console.log("did you get username from getRPfoeil?" + username);
+    if (response.data.success) {
+      sessionStorage.setItem("name", response.data.response.username);
+    } else {
+    }
   }
 
   return (
@@ -66,9 +66,9 @@ function LoginPage() {
           Empower Your Documents with AI
         </h1>
         <p className="text-gray-200 mb-4 text-center">
-          Upload your documents and let our AI analyze them. We&lsquo;ll find the
-          right documents for you, provide valuable accounting information, and
-          more.
+          Upload your documents and let our AI analyze them. We&lsquo;ll find
+          the right documents for you, provide valuable accounting information,
+          and more.
         </p>
         <LottieAnimation
           animationData={animationData}

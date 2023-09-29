@@ -19,11 +19,12 @@ async function handler(req, res) {
               "accept": "application/json",
               "Authorization": `Bearer ${token}`,  // Set the authorization header
               "Content-Type": req.headers["content-type"]
-          },
+          }
+          ,timeout: 180000
       };
 
       try {
-          const { data } = await axios.post('http://54.193.180.218:8001/uploadfiles', req, axiosConfig);
+          const { data } = await axios.post('http://54.193.180.218:8000/uploadfiles', req, axiosConfig);
           data.pipe(res);  
           res.status(200).json({
               success: true,
@@ -34,20 +35,20 @@ async function handler(req, res) {
 
           let errorMessage;
 
-          if (error.response?.data?.detail) {
-              // Check specific error messages
-              if (error.response.data.detail.includes("FileType.UNK file type is not supported")) {
-                  errorMessage = "Unsupported file type.";
-              } else if (error.response.data.detail.includes("File name conflict")) {
-                  errorMessage = "Same file found.";
-              } else {
-                  errorMessage = error.response.data.detail;
-              }
-          } else {
-              errorMessage = "Failed to upload";
-          }
+        //   if (error.response?.data?.detail) {
+        //       // Check specific error messages
+        //       if (error.response.data.detail.includes("FileType.UNK file type is not supported")) {
+        //           errorMessage = "Unsupported file type.";
+        //       } else if (error.response.data.detail.includes("File name conflict")) {
+        //           errorMessage = "Same file found.";
+        //       } else {
+        //           errorMessage = error.response.data.detail;
+        //       }
+        //   } else {
+        //       errorMessage = "Failed to upload";
+        //   }
 
-          res.status(error.response?.status || 500).json({
+          res.status(500).json({
               message: errorMessage,
               success: false
           });
